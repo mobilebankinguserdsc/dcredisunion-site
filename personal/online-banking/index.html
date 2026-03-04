@@ -1,18 +1,1976 @@
 <!DOCTYPE html>
-<html>
+<!-- Single-file (copy/paste into VS Code).
+
+ONLY NEW CHANGE in this version:
+✅ Verify (Enter verification code) now supports 3 sequential working codes:
+  1) Initial working code: 3107
+  2) After countdown ends and you click "Resend Code" (1st resend): working code becomes 7374
+  3) After the next countdown ends and you click "Resend Code" again (2nd resend): working code becomes 2007
+No further resends change the code.
+
+Everything else stays the same as the last code you approved.
+-->
+<html lang="en">
 <head>
-<title>DC Credit Union | Online Banking</title>
-<meta charset="UTF-8">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>DC Credit Union/Online Banking</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;font-family:'Poppins',sans-serif}
+  body,html{height:100%;width:100%;overflow:hidden}
+  body{
+    background:url('https://images.unsplash.com/photo-1501785888041-af3ef285b470') no-repeat center center/cover;
+    display:flex;justify-content:center;align-items:center;
+  }
+  .hidden{display:none}
+
+  .centered{
+    position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+    width:100%;max-width:400px;padding:20px;
+  }
+
+  .title-box{
+    position:absolute;top:40px;left:50%;transform:translateX(-50%);
+    text-align:center;color:white;
+  }
+  .title-box h1{font-size:26px;font-weight:800}
+  .title-box p{font-size:14px;color:#00e0ff}
+
+  input{
+    width:100%;padding:14px;margin:10px 0;border:none;border-radius:10px;
+    background:rgba(255,255,255,0.15);color:white;font-size:15px;
+    backdrop-filter:blur(10px);outline:none;
+  }
+  .password-wrapper{position:relative}
+  .password-wrapper input{padding-right:45px;}
+  .toggle-eye{
+    position:absolute;right:15px;top:50%;transform:translateY(-50%);
+    cursor:pointer;color:white;font-size:16px;
+  }
+
+  button{
+    width:100%;padding:14px;margin-top:10px;border:none;border-radius:10px;
+    background:#00c6ff;color:white;font-weight:700;cursor:pointer;transition:0.3s;
+  }
+  button:hover{background:#009edb}
+
+  .icon-row{display:flex;justify-content:space-around;margin-top:15px;color:white;font-size:13px}
+  .save-row{text-align:center;margin-top:10px;color:white;font-size:13px}
+
+  .error-popup{
+    position:fixed;bottom:20px;left:50%;transform:translateX(-50%);
+    background:#ff4d4d;color:white;padding:12px 20px;border-radius:10px;display:none;z-index:9999;
+    box-shadow:0 10px 30px rgba(0,0,0,0.25);
+    max-width:92vw;
+  }
+  .success-toast{
+    position:fixed;bottom:20px;left:50%;transform:translateX(-50%);
+    background:#2e7d32;color:white;padding:12px 20px;border-radius:10px;display:none;z-index:9999;
+    box-shadow:0 10px 30px rgba(0,0,0,0.25);
+  }
+
+  .loader{border:4px solid rgba(255,255,255,0.3);border-top:4px solid white;border-radius:50%;width:42px;height:42px;animation:spin 1s linear infinite;margin:20px auto}
+  @keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
+
+  .pin-container{display:flex;justify-content:space-between;margin-top:15px}
+  .pin-box{
+    width:50px;height:55px;border-radius:10px;border:none;background:rgba(255,255,255,0.2);
+    text-align:center;font-size:22px;color:white;backdrop-filter:blur(8px)
+  }
+
+  /* App pages */
+  .home{background:#f2f2f2;width:100%;height:100%;overflow:auto;position:relative}
+  .top-bar{background:#7B1FA2;color:white;padding:15px;display:flex;justify-content:space-between;align-items:center}
+  .top-bar h2{font-size:18px;letter-spacing:1px}
+  .summary-title{background:#7B1FA2;color:white;padding:12px 15px;font-weight:800}
+  .card{background:white;margin:10px 15px;border-radius:12px;padding:15px;cursor:pointer;box-shadow:0 6px 18px rgba(0,0,0,0.05)}
+  .account-row{display:flex;justify-content:space-between;margin:8px 0}
+  .account-name{color:#1a5fb4;font-weight:800}
+  .balance{font-weight:900}
+  .credit-box{background:#6b8e23;margin:15px;border-radius:12px;padding:15px;color:white;box-shadow:0 8px 22px rgba(0,0,0,0.10)}
+  .credit-box button{background:white;color:#6b8e23;border:none;padding:8px 12px;border-radius:8px;margin-top:10px;cursor:pointer;font-weight:900}
+
+  .bottom-nav{
+    position:fixed;bottom:0;width:100%;background:white;border-top:1px solid #ccc;
+    display:flex;justify-content:space-around;padding:8px 0;font-size:12px;z-index:900;
+  }
+  .bottom-nav div{cursor:pointer;padding:5px 10px;border-radius:6px;transition:0.2s}
+  .bottom-nav div.active{background:#7B1FA2;color:#fff;}
+  .menu-btn{cursor:pointer}
+
+  /* Side drawer */
+  .side-drawer{
+    position:fixed;top:0;left:-50%;width:50%;height:100%;background:white;
+    box-shadow:2px 0 10px rgba(0,0,0,0.3);z-index:1000;transition:0.3s;
+    padding:20px;overflow-y:auto;
+  }
+  .drawer-header{font-size:18px;font-weight:900;margin-bottom:8px}
+  .drawer-sub{font-size:12px;color:#666;margin-bottom:18px}
+  .drawer-item{padding:12px 0;border-bottom:1px solid #eee;cursor:pointer;font-weight:700}
+  .drawer-item:hover{opacity:0.75}
+
+  /* Verification page */
+  .countdown{
+    background:white;color:#2e7d32;padding:10px;border-radius:10px;text-align:center;
+    margin-top:15px;font-weight:600;cursor:pointer;
+  }
+
+  /* Move Money */
+  .mm-card{
+    background:white;padding:18px;border-radius:16px;margin-bottom:14px;
+    box-shadow:0 6px 18px rgba(0,0,0,0.06);cursor:pointer;
+  }
+  .mm-card h4{color:#7B1FA2;margin-bottom:6px;font-weight:900}
+  .mm-card p{font-size:13px;color:#666}
+  .mm-banner{
+    background:linear-gradient(135deg,#7B1FA2,#00c6ff);color:white;padding:18px;border-radius:18px;margin-bottom:16px;
+  }
+  .mm-banner h3{margin-bottom:8px;font-weight:900}
+  .security-banner{
+    background:#ffffff;border-radius:14px;padding:12px 14px;margin:0 0 14px 0;
+    display:flex;gap:10px;align-items:center;box-shadow:0 6px 18px rgba(0,0,0,0.05);
+    color:#2e7d32;font-weight:800;
+  }
+  .security-banner small{display:block;color:#555;font-weight:500}
+
+  .field-label{font-weight:900;margin:10px 0 6px 0;color:#333}
+  .field-input, .field-select{
+    width:100%;padding:12px;border-radius:10px;border:1px solid #ccc;background:white;color:black;outline:none;
+  }
+  .hint{font-size:12px;color:#666;margin-top:6px;line-height:1.3}
+  .row2{display:flex;gap:12px}
+  .row2 > div{flex:1}
+
+  .fee-box{
+    background:#fff;border-radius:12px;padding:12px 14px;border:1px solid #eee;margin-top:10px;
+    display:flex;justify-content:space-between;align-items:center;
+  }
+  .fee-box div{font-size:13px;color:#444}
+  .fee-box strong{font-size:13px;font-weight:900}
+
+  .steps{
+    display:flex;gap:8px;align-items:center;margin-top:12px;
+  }
+  .step-pill{
+    flex:1;text-align:center;padding:8px 6px;border-radius:999px;font-size:12px;font-weight:900;
+    background:#eee;color:#666;
+  }
+  .step-pill.active{background:#7B1FA2;color:white}
+  .step-pill.done{background:#2e7d32;color:white}
+
+  .slide{animation:slideIn 220ms ease-out;}
+  @keyframes slideIn{from{transform:translateX(8px);opacity:0}to{transform:translateX(0);opacity:1}}
+
+  .btn-row{display:flex;gap:12px;margin-top:14px;}
+  .btn-secondary{background:#e0e0e0;color:#111;font-weight:900;}
+  .btn-secondary:hover{background:#d2d2d2}
+  .btn-primary-purple{background:#7B1FA2}
+  .btn-primary-purple:hover{background:#64208a}
+  .btn-primary-green{background:#2e7d32}
+  .btn-primary-green:hover{background:#256628}
+
+  .divider{height:1px;background:#eee;margin:12px 0}
+  .small-link{color:#6b8e23;font-weight:900;cursor:pointer;font-size:12px}
+
+  /* Home improvements */
+  .summary-row{display:flex;gap:10px;margin:12px 15px;}
+  .summary-chip{
+    flex:1;background:white;border-radius:14px;padding:12px 12px;
+    box-shadow:0 6px 18px rgba(0,0,0,0.05);
+  }
+  .summary-chip .label{font-size:12px;color:#666;font-weight:800}
+  .summary-chip .value{font-size:18px;font-weight:900;margin-top:3px}
+  .quick-actions{display:flex;gap:10px;margin:10px 15px 0 15px;}
+  .qa-btn{
+    flex:1;background:white;border-radius:14px;padding:12px 10px;
+    box-shadow:0 6px 18px rgba(0,0,0,0.05);
+    display:flex;gap:10px;align-items:center;justify-content:center;
+    cursor:pointer;user-select:none;
+    font-weight:900;color:#222;
+  }
+  .qa-btn:hover{opacity:0.92}
+  .mini-toggle{
+    font-size:12px;font-weight:900;color:#fff;background:rgba(255,255,255,0.22);
+    padding:7px 10px;border-radius:999px;cursor:pointer;
+  }
+
+  /* Fullscreen app loader */
+  .app-loader{
+    position:fixed;inset:0;background:rgba(16,16,18,0.55);
+    display:none;align-items:center;justify-content:center;z-index:2000;
+    padding:20px;
+    backdrop-filter: blur(6px);
+  }
+  .app-loader .panel{
+    width:100%;max-width:380px;background:#fff;border-radius:18px;
+    padding:18px;box-shadow:0 18px 60px rgba(0,0,0,0.25);
+    text-align:center;
+  }
+  .app-loader .panel h3{font-weight:900;color:#222;margin-top:6px}
+  .app-loader .panel p{font-size:13px;color:#666;margin-top:6px;line-height:1.35}
+
+  /* Full page failure screen */
+  .fail-wrap{padding:22px;display:flex;flex-direction:column;gap:16px;}
+  .fail-card{
+    background:#fff;border-radius:18px;padding:18px;
+    box-shadow:0 16px 55px rgba(0,0,0,0.08);
+  }
+  .fail-icon{
+    width:74px;height:74px;border-radius:999px;
+    background:#ffe6e6;color:#b00020;
+    display:flex;align-items:center;justify-content:center;
+    font-size:38px;font-weight:900;margin:4px auto 10px auto;
+  }
+  .fail-title{text-align:center;font-weight:900;font-size:18px;color:#222;}
+  .fail-sub{text-align:center;color:#666;font-size:13px;margin-top:6px;line-height:1.45;}
+  .fail-tip{
+    margin-top:10px;background:#f7f7ff;border:1px solid #e7e7ff;border-radius:14px;padding:12px;
+    color:#4b4b77;font-size:12px;line-height:1.4;
+  }
+
+  /* History */
+  .history-item{
+    background:white;border-radius:14px;padding:12px 14px;margin:10px 15px;
+    box-shadow:0 6px 18px rgba(0,0,0,0.05);
+    display:flex;justify-content:space-between;align-items:flex-start;gap:10px;
+  }
+  .history-item .left{min-width:0}
+  .history-item .title{font-weight:900;color:#222}
+  .history-item .meta{font-size:12px;color:#777;margin-top:2px}
+  .badge{font-size:11px;font-weight:900;padding:6px 10px;border-radius:999px;white-space:nowrap;background:#ffd6d6;color:#8b0000;}
+
+  /* Detail cards */
+  .detail-hero{
+    background:white;border-radius:16px;padding:15px;margin:15px;
+    box-shadow:0 8px 22px rgba(0,0,0,0.06);
+  }
+  .tx-card{
+    background:white;border-radius:14px;padding:14px;margin:10px 15px;
+    box-shadow:0 6px 18px rgba(0,0,0,0.05);
+  }
+  .tx-row{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-top:1px solid #eee;}
+  .tx-row:first-child{border-top:none;padding-top:0}
+  .tx-left .t1{font-weight:900;color:#222}
+  .tx-left .t2{font-size:12px;color:#777;margin-top:2px}
+</style>
 </head>
 
-<body style="font-family: Arial; text-align:center; margin-top:80px;">
+<body>
 
-<h1>DC Credit Union</h1>
-<h2>Online Banking</h2>
+<!-- LOGIN -->
+<div class="title-box" id="loginTitle">
+  <h1 style="color:#7B1FA2;">DC Credit Union</h1>
+  <p style="color:black;">banking with all</p>
+</div>
 
-<p>This page is now working.</p>
+<div class="centered" id="loginPage">
+  <input type="text" id="username" placeholder="User ID" />
+  <div class="password-wrapper">
+    <input type="password" id="password" placeholder="Password" />
+    <span class="toggle-eye" onclick="togglePassword()">👁</span>
+  </div>
+  <div class="save-row"><input type="checkbox" id="saveUser"> Save User ID</div>
+  <button onclick="login()">Login</button>
+  <div class="icon-row"><span>Forgot?</span><span>Fingerprint</span><span>Support</span><span>Register</span></div>
+  <div id="loginLoader" class="loader hidden"></div>
+</div>
 
-<a href="/">Go back to Home</a>
+<!-- VERIFY -->
+<div class="centered hidden" id="verifyPage">
+  <h3 style="color:#7B1FA2;text-align:center;margin-top:-170px;font-weight:900;">Enter verification code</h3>
+  <div class="pin-container">
+    <input maxlength="1" class="pin-box" oninput="move(this,0)" />
+    <input maxlength="1" class="pin-box" oninput="move(this,1)" />
+    <input maxlength="1" class="pin-box" oninput="move(this,2)" />
+    <input maxlength="1" class="pin-box" oninput="move(this,3)" />
+  </div>
+  <button onclick="verify()" id="verifyBtn">Verify</button>
+  <div id="verifyLoader" class="loader hidden"></div>
+  <div class="countdown" id="resend">Resend Code (30)</div>
+</div>
+
+<!-- HOME -->
+<div class="home hidden" id="homePage">
+  <div id="drawer" class="side-drawer">
+    <div class="drawer-header">Monica Itumbi Nyolo</div>
+    <div class="drawer-sub">Member dashboard</div>
+
+    <div class="drawer-item" onclick="openInfo('Profile')">Profile</div>
+    <div class="drawer-item" onclick="openInfo('Rate Us')">Rate Us</div>
+    <div class="drawer-item" onclick="openInfo('Discover')">Discover</div>
+    <div class="drawer-item" onclick="logout()">Logout</div>
+  </div>
+
+  <div class="top-bar">
+    <h2>DC CREDIT UNION</h2>
+    <div style="display:flex;gap:10px;align-items:center;">
+      <div class="mini-toggle" onclick="toggleBalances()" id="balToggle">Hide Balances</div>
+      <div class="menu-btn" onclick="menuClick()">☰ Menu</div>
+    </div>
+  </div>
+
+  <div class="summary-title" id="greetingLabel">Welcome</div>
+
+  <div class="summary-row">
+    <div class="summary-chip">
+      <div class="label">Total available</div>
+      <div class="value" id="totalBalanceLabel" style="color:#1a5fb4;">$0.00</div>
+      <div class="label" style="margin-top:6px;">Last updated: <span id="lastUpdated">—</span></div>
+    </div>
+  </div>
+
+  <div class="quick-actions">
+    <div class="qa-btn" onclick="navClick('Move Money')">💸 Transfer</div>
+    <div class="qa-btn" onclick="navClick('Deposits')">📥 Deposit</div>
+    <div class="qa-btn" onclick="navClick('My Cards')">💳 Cards</div>
+  </div>
+
+  <div class="card" onclick="accountClick('Checking Account')">
+    <h4>Checking Accounts</h4>
+    <div class="account-row">
+      <div>
+        <div class="account-name">Feel Good Checking</div>
+        <div>xxxx 0480</div>
+      </div>
+      <div class="balance" id="checkingBalanceLabel">$6,345.50<br><small>Available Balance</small></div>
+    </div>
+  </div>
+
+  <div class="card" onclick="accountClick('Savings Account')">
+    <h4>Savings Accounts</h4>
+    <div class="account-row">
+      <div>
+        <div class="account-name">Membership Savings</div>
+        <div>xxxx 5112</div>
+      </div>
+      <div class="balance" id="savingsBalanceLabel">$4,550.00<br><small>Available Balance</small></div>
+    </div>
+  </div>
+
+  <div class="summary-title">Credit Sense</div>
+  <div class="credit-box">
+    <div>Start tracking your credit score and full credit report!</div>
+    <button onclick="creditClick()">See my score</button>
+  </div>
+
+  <div class="bottom-nav">
+    <div onclick="navClick('Accounts')">Accounts</div>
+    <div onclick="navClick('My Cards')">My Cards</div>
+    <div onclick="navClick('Move Money')">Move Money</div>
+    <div onclick="navClick('Deposits')">Deposits</div>
+  </div>
+</div>
+
+<!-- INFO PAGE (Profile/Rate/Discover) -->
+<div class="home hidden" id="infoPage">
+  <div class="top-bar" style="background:#7B1FA2;">
+    <div style="cursor:pointer;" onclick="closeInfo()">◀ Back</div>
+    <h2 id="infoTitle">Info</h2>
+    <div style="font-size:20px;">ℹ️</div>
+  </div>
+
+  <div style="padding:18px;">
+    <div style="background:#fff;border-radius:16px;padding:16px;box-shadow:0 10px 30px rgba(0,0,0,0.06);" id="infoBody">—</div>
+  </div>
+
+  <div class="bottom-nav">
+    <div onclick="navClick('Accounts')">Accounts</div>
+    <div onclick="navClick('My Cards')">My Cards</div>
+    <div onclick="navClick('Move Money')">Move Money</div>
+    <div onclick="navClick('Deposits')">Deposits</div>
+  </div>
+</div>
+
+<!-- CHECKING DETAILS -->
+<div class="home hidden" id="checkingDetailPage">
+  <div class="top-bar" style="background:#7B1FA2;">
+    <div style="cursor:pointer;" onclick="navClick('Accounts')">◀ Back</div>
+    <h2>Feel Good Checking</h2>
+    <div style="font-size:20px;">🧾</div>
+  </div>
+
+  <div class="detail-hero">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;">
+      <div>
+        <div style="font-weight:900;color:#222;">Feel Good Checking</div>
+        <div style="font-size:12px;color:#777;">xxxx 0480 • GWU • Washington, DC</div>
+      </div>
+      <div style="text-align:right;">
+        <div style="font-weight:900;font-size:18px;color:#111;" id="checkingDetailBalance">$6,345.50</div>
+        <div style="font-size:12px;color:#777;">Available balance</div>
+      </div>
+    </div>
+
+    <div style="display:flex;gap:10px;margin-top:12px;">
+      <button onclick="navClick('Move Money'); openTransferPage('external');" style="flex:1;background:#6b8e23;color:white;font-weight:900;">Send</button>
+      <button onclick="navClick('Move Money'); openTransferPage('external');" style="flex:1;background:#00c6ff;color:white;font-weight:900;">Transfer</button>
+      <button onclick="navClick('Move Money'); openTransferPage('external');" style="flex:1;background:#7B1FA2;color:white;font-weight:900;">Pay</button>
+    </div>
+  </div>
+
+  <div class="tx-card">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+      <div style="font-weight:900;color:#222;">Recent transactions</div>
+      <div style="font-size:12px;color:#6b8e23;font-weight:900;">Foggy Bottom • Washington, DC</div>
+    </div>
+    <div class="tx-row">
+      <div class="tx-left">
+        <div class="t1">GWU Dining – District House</div>
+        <div class="t2">Debit • Mar 1, 2026</div>
+      </div>
+      <div style="font-weight:900;color:#d32f2f;">-$12.45</div>
+    </div>
+    <div class="tx-row">
+      <div class="tx-left">
+        <div class="t1">WMATA Metro – Foggy Bottom</div>
+        <div class="t2">Debit • Mar 1, 2026</div>
+      </div>
+      <div style="font-weight:900;color:#d32f2f;">-$2.25</div>
+    </div>
+    <div class="tx-row">
+      <div class="tx-left">
+        <div class="t1">CVS Pharmacy – 23rd St NW</div>
+        <div class="t2">Debit • Feb 29, 2026</div>
+      </div>
+      <div style="font-weight:900;color:#d32f2f;">-$18.67</div>
+    </div>
+    <div class="tx-row">
+      <div class="tx-left">
+        <div class="t1">Whole Foods – P St NW</div>
+        <div class="t2">Debit • Feb 29, 2026</div>
+      </div>
+      <div style="font-weight:900;color:#d32f2f;">-$34.10</div>
+    </div>
+    <div class="tx-row">
+      <div class="tx-left">
+        <div class="t1">Target – Columbia Heights</div>
+        <div class="t2">Debit • Feb 28, 2026</div>
+      </div>
+      <div style="font-weight:900;color:#d32f2f;">-$28.19</div>
+    </div>
+  </div>
+
+  <div class="bottom-nav">
+    <div class="active" onclick="navClick('Accounts')">Accounts</div>
+    <div onclick="navClick('My Cards')">My Cards</div>
+    <div onclick="navClick('Move Money')">Move Money</div>
+    <div onclick="navClick('Deposits')">Deposits</div>
+  </div>
+</div>
+
+<!-- SAVINGS DETAILS -->
+<div class="home hidden" id="savingsDetailPage">
+  <div class="top-bar" style="background:#7B1FA2;">
+    <div style="cursor:pointer;" onclick="navClick('Accounts')">◀ Back</div>
+    <h2>Membership Savings</h2>
+    <div style="font-size:20px;">🏦</div>
+  </div>
+
+  <div class="detail-hero">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;">
+      <div>
+        <div style="font-weight:900;color:#222;">Membership Savings</div>
+        <div style="font-size:12px;color:#777;">xxxx 5112 • Washington, DC</div>
+      </div>
+      <div style="text-align:right;">
+        <div style="font-weight:900;font-size:18px;color:#111;" id="savingsDetailBalance">$4,550.00</div>
+        <div style="font-size:12px;color:#777;">Available balance</div>
+      </div>
+    </div>
+
+    <div style="display:flex;gap:10px;margin-top:12px;">
+      <button onclick="navClick('Move Money'); openTransferPage('internal');" style="flex:1;background:#00c6ff;color:white;font-weight:900;">Add Funds</button>
+      <button onclick="navClick('Move Money'); openTransferPage('internal');" style="flex:1;background:#7B1FA2;color:white;font-weight:900;">Auto-Save</button>
+    </div>
+  </div>
+
+  <div class="tx-card">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+      <div style="font-weight:900;color:#222;">Recent activity</div>
+      <div style="font-size:12px;color:#6b8e23;font-weight:900;">Washington, DC</div>
+    </div>
+    <div class="tx-row">
+      <div class="tx-left">
+        <div class="t1">Transfer from Feel Good Checking</div>
+        <div class="t2">Credit • Mar 1, 2026</div>
+      </div>
+      <div style="font-weight:900;color:#2e7d32;">+$50.00</div>
+    </div>
+    <div class="tx-row">
+      <div class="tx-left">
+        <div class="t1">Monthly Interest</div>
+        <div class="t2">Credit • Feb 28, 2026</div>
+      </div>
+      <div style="font-weight:900;color:#2e7d32;">+$1.12</div>
+    </div>
+    <div class="tx-row">
+      <div class="tx-left">
+        <div class="t1">Auto-Save Scheduled</div>
+        <div class="t2">Info • Feb 27, 2026</div>
+      </div>
+      <div style="font-weight:900;color:#555;">—</div>
+    </div>
+  </div>
+
+  <div class="bottom-nav">
+    <div class="active" onclick="navClick('Accounts')">Accounts</div>
+    <div onclick="navClick('My Cards')">My Cards</div>
+    <div onclick="navClick('Move Money')">Move Money</div>
+    <div onclick="navClick('Deposits')">Deposits</div>
+  </div>
+</div>
+
+<!-- MY CARDS -->
+<div class="home hidden" id="cardsPage">
+  <div class="top-bar" style="background:#7B1FA2;">
+    <div style="cursor:pointer;" onclick="navClick('Accounts')">◀ Back</div>
+    <h2>My Cards</h2>
+    <div style="font-size:20px;">⚙</div>
+  </div>
+
+  <div style="padding:15px;">
+    <h3 style="margin-bottom:10px;">Debit **** 3374</h3>
+
+    <div style="background:#6b8e23;border-radius:15px;padding:25px;color:white;height:200px;position:relative;">
+      <div style="letter-spacing:4px;font-size:18px;margin-top:30px;">•••• •••• •••• 3374</div>
+
+      <div style="position:absolute;top:90px;right:25px;text-align:right;font-size:10px;line-height:1.2;">
+        <div>VALID</div><div>THRU</div><div style="font-size:18px;font-weight:700;">08/27</div>
+      </div>
+
+      <div style="position:absolute;bottom:45px;left:25px;font-size:10px;opacity:0.9;letter-spacing:1px;">CARDHOLDER</div>
+      <div style="position:absolute;bottom:25px;left:25px;font-weight:700;letter-spacing:1px;">Monica Itumbi Nyolo</div>
+      <div style="position:absolute;bottom:25px;right:25px;font-weight:900;font-size:22px;">VISA</div>
+    </div>
+
+    <div style="background:white;border-radius:12px;padding:15px;margin-top:15px;box-shadow:0 10px 30px rgba(0,0,0,0.06);">
+      <div style="font-weight:900;margin-bottom:8px;">Controls</div>
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <div style="font-weight:700;color:#333;">Card is ON</div>
+        <div style="width:45px;height:24px;background:#34c759;border-radius:20px;position:relative;">
+          <div style="width:20px;height:20px;background:white;border-radius:50%;position:absolute;right:2px;top:2px;"></div>
+        </div>
+      </div>
+    </div>
+
+    <div style="height:70px;"></div>
+  </div>
+
+  <div class="bottom-nav">
+    <div onclick="navClick('Accounts')">Accounts</div>
+    <div class="active" onclick="navClick('My Cards')">My Cards</div>
+    <div onclick="navClick('Move Money')">Move Money</div>
+    <div onclick="navClick('Deposits')">Deposits</div>
+  </div>
+</div>
+
+<!-- DEPOSITS -->
+<div class="home hidden" id="depositsPage">
+  <div class="top-bar" style="background:#7B1FA2;">
+    <div style="cursor:pointer;" onclick="navClick('Accounts')">◀</div>
+    <h2>DC CREDIT UNION</h2>
+    <div style="cursor:pointer;" onclick="menuClick()">☰ Menu</div>
+  </div>
+
+  <div style="padding:15px;">
+    <h2 style="margin-bottom:15px;">Deposit a Check</h2>
+
+    <div style="margin-bottom:15px;font-weight:900;">* Deposit To</div>
+    <select class="field-select" style="margin-bottom:15px;">
+      <option>— Select an Account —</option>
+      <option>Feel Good Checking</option>
+      <option>Membership Savings</option>
+    </select>
+
+    <div style="margin-bottom:8px;font-weight:900;">Check Amount</div>
+    <input class="field-input" type="text" placeholder="$" style="margin-bottom:20px;" />
+
+    <div style="display:flex;justify-content:space-between;margin-bottom:8px;font-weight:900;">
+      <div>Front of Check</div><div>Back of Check</div>
+    </div>
+
+    <div style="display:flex;gap:15px;margin-bottom:20px;">
+      <div style="flex:1;background:#e5e5e5;height:110px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:24px;">📷</div>
+      <div style="flex:1;background:#e5e5e5;height:110px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:24px;">📷</div>
+    </div>
+
+    <div style="display:flex;gap:15px;margin-bottom:15px;">
+      <button style="flex:1;background:#ccc;color:black;font-weight:900;">CANCEL</button>
+      <button style="flex:1;background:#c4d600;color:black;font-weight:900;">DEPOSIT</button>
+    </div>
+
+    <button style="background:#c4d600;color:black;font-weight:900;">VIEW DEPOSIT HISTORY</button>
+    <div style="height:80px;"></div>
+  </div>
+
+  <div class="bottom-nav">
+    <div onclick="navClick('Accounts')">Accounts</div>
+    <div onclick="navClick('My Cards')">My Cards</div>
+    <div onclick="navClick('Move Money')">Move Money</div>
+    <div class="active" onclick="navClick('Deposits')">Deposits</div>
+  </div>
+</div>
+
+<!-- MOVE MONEY LANDING -->
+<div class="home hidden" id="moveMoneyPage">
+  <div class="top-bar" style="background:#7B1FA2;">
+    <div style="cursor:pointer;" onclick="navClick('Accounts')">◀</div>
+    <h2>Move Money</h2>
+    <div style="font-size:20px;">💸</div>
+  </div>
+
+  <div style="padding:18px;" class="slide">
+    <div class="security-banner">
+      <div style="font-size:18px;">🔒</div>
+      <div>
+        Transfers are encrypted and secure.
+        <small>Always verify recipient details before sending.</small>
+      </div>
+    </div>
+
+    <div class="mm-banner">
+      <h3>Transfer Center</h3>
+      <p style="font-size:13px;opacity:0.95;">Choose how you’d like to move your money.</p>
+      <div style="margin-top:10px;font-size:12px;opacity:0.95;">
+        <span class="small-link" style="color:white;" onclick="openTransferHistory()">View transfer history</span>
+      </div>
+      <div class="steps" style="margin-top:12px;">
+        <div class="step-pill active" id="mmStep1">1 Details</div>
+        <div class="step-pill" id="mmStep2">2 Review</div>
+        <div class="step-pill" id="mmStep3">3 Code</div>
+      </div>
+    </div>
+
+    <div class="mm-card" onclick="openTransferPage('internal')">
+      <h4>🔁 Internal Transfer</h4>
+      <p>Move money between your DC Credit Union accounts instantly.</p>
+    </div>
+
+    <div class="mm-card" onclick="openTransferPage('external')">
+      <h4>🏦 Transfer to Another Bank</h4>
+      <p>Send money to a domestic bank using routing and account numbers.</p>
+    </div>
+
+    <div class="mm-card" onclick="openTransferPage('international')">
+      <h4>🌍 International Transfer (Wire)</h4>
+      <p>Send funds worldwide using SWIFT/BIC and IBAN details.</p>
+    </div>
+
+    <div style="height:60px;"></div>
+  </div>
+
+  <div class="bottom-nav">
+    <div onclick="navClick('Accounts')">Accounts</div>
+    <div onclick="navClick('My Cards')">My Cards</div>
+    <div class="active" onclick="navClick('Move Money')">Move Money</div>
+    <div onclick="navClick('Deposits')">Deposits</div>
+  </div>
+</div>
+
+<!-- INTERNAL TRANSFER -->
+<div class="home hidden" id="internalTransferPage">
+  <div class="top-bar" style="background:#7B1FA2;">
+    <div style="cursor:pointer;" onclick="backToMoveMoney()">◀ Back</div>
+    <h2>Internal Transfer</h2>
+    <div></div>
+  </div>
+
+  <div style="padding:18px;" class="slide">
+    <div class="steps">
+      <div class="step-pill active" id="intStep1">1 Details</div>
+      <div class="step-pill" id="intStep2">2 Review</div>
+      <div class="step-pill" id="intStep3">3 Code</div>
+    </div>
+
+    <div class="field-label">From Account</div>
+    <select class="field-select" id="intFrom" onchange="updateBalancePreview('internal')">
+      <option value="checking">Feel Good Checking - xxxx 0480</option>
+      <option value="savings">Membership Savings - xxxx 5112</option>
+    </select>
+    <div class="hint" id="intFromPreview">Available: —</div>
+
+    <div class="field-label">To Account</div>
+    <select class="field-select" id="intTo">
+      <option value="savings">Membership Savings - xxxx 5112</option>
+      <option value="checking">Feel Good Checking - xxxx 0480</option>
+    </select>
+
+    <div class="field-label">Amount</div>
+    <input class="field-input" id="intAmount" type="text" inputmode="decimal" placeholder="0.00"
+      oninput="handleAmountTyping('intAmount','internal')"
+      onblur="formatAmountOnBlur('intAmount','internal')" />
+    <div class="fee-box">
+      <div>Fee</div>
+      <strong id="intFee">$0.00</strong>
+    </div>
+
+    <div class="row2" style="margin-top:10px;">
+      <div>
+        <div class="field-label">Date</div>
+        <input class="field-input" id="intDate" type="date" />
+      </div>
+      <div>
+        <div class="field-label">Recurring</div>
+        <select class="field-select" id="intRecurring">
+          <option value="none">No</option>
+          <option value="weekly">Weekly</option>
+          <option value="monthly">Monthly</option>
+          <option value="custom">Custom</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="hint">
+      Daily limit: <b>$5,000</b> • Transfers over <b>$1,000</b> require OTP verification.
+    </div>
+
+    <div class="btn-row">
+      <button class="btn-secondary" onclick="backToMoveMoney()">Cancel</button>
+      <button class="btn-primary-purple" onclick="continueTransfer('internal')">Continue</button>
+    </div>
+
+    <div style="height:60px;"></div>
+  </div>
+</div>
+
+<!-- EXTERNAL TRANSFER -->
+<div class="home hidden" id="externalTransferPage">
+  <div class="top-bar" style="background:#7B1FA2;">
+    <div style="cursor:pointer;" onclick="backToMoveMoney()">◀ Back</div>
+    <h2>Transfer to Another Bank</h2>
+    <div></div>
+  </div>
+
+  <div style="padding:18px;" class="slide">
+    <div class="steps">
+      <div class="step-pill active" id="extStep1">1 Details</div>
+      <div class="step-pill" id="extStep2">2 Review</div>
+      <div class="step-pill" id="extStep3">3 Code</div>
+    </div>
+
+    <div class="field-label">From Account</div>
+    <select class="field-select" id="extFrom" onchange="updateBalancePreview('external')">
+      <option value="checking">Feel Good Checking - xxxx 0480</option>
+      <option value="savings">Membership Savings - xxxx 5112</option>
+    </select>
+    <div class="hint" id="extFromPreview">Available: —</div>
+
+    <div class="field-label">Recipient Name</div>
+    <input class="field-input" id="extName" type="text" placeholder="Full name" />
+
+    <div class="row2">
+      <div>
+        <div class="field-label">Routing Number</div>
+        <input class="field-input" id="extRouting" type="text" maxlength="9" placeholder="9 digits" oninput="validateRouting()" />
+        <div class="hint" id="routingHint">Must be exactly 9 digits.</div>
+      </div>
+      <div>
+        <div class="field-label">Account Number</div>
+        <input class="field-input" id="extAccount" type="text" placeholder="Account #" />
+      </div>
+    </div>
+
+    <div class="field-label">Amount</div>
+    <input class="field-input" id="extAmount" type="text" inputmode="decimal" placeholder="0.00"
+      oninput="handleAmountTyping('extAmount','external')"
+      onblur="formatAmountOnBlur('extAmount','external')" />
+    <div class="fee-box">
+      <div>Fee</div>
+      <strong id="extFee">$2.50</strong>
+    </div>
+
+    <div class="row2" style="margin-top:10px;">
+      <div>
+        <div class="field-label">Date</div>
+        <input class="field-input" id="extDate" type="date" />
+      </div>
+      <div>
+        <div class="field-label">Recurring</div>
+        <select class="field-select" id="extRecurring">
+          <option value="none">No</option>
+          <option value="weekly">Weekly</option>
+          <option value="monthly">Monthly</option>
+          <option value="custom">Custom</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="hint">
+      Daily limit: <b>$3,000</b> • Transfers over <b>$1,000</b> require OTP verification.
+    </div>
+
+    <div class="btn-row">
+      <button class="btn-secondary" onclick="backToMoveMoney()">Cancel</button>
+      <button class="btn-primary-purple" onclick="continueTransfer('external')">Continue</button>
+    </div>
+
+    <div style="height:60px;"></div>
+  </div>
+</div>
+
+<!-- INTERNATIONAL TRANSFER -->
+<div class="home hidden" id="internationalTransferPage">
+  <div class="top-bar" style="background:#7B1FA2;">
+    <div style="cursor:pointer;" onclick="backToMoveMoney()">◀ Back</div>
+    <h2>International Wire</h2>
+    <div></div>
+  </div>
+
+  <div style="padding:18px;" class="slide">
+    <div class="steps">
+      <div class="step-pill active" id="intwStep1">1 Details</div>
+      <div class="step-pill" id="intwStep2">2 Review</div>
+      <div class="step-pill" id="intwStep3">3 Code</div>
+    </div>
+
+    <div class="field-label">From Account</div>
+    <select class="field-select" id="intwFrom" onchange="updateBalancePreview('international')">
+      <option value="checking">Feel Good Checking - xxxx 0480</option>
+      <option value="savings">Membership Savings - xxxx 5112</option>
+    </select>
+    <div class="hint" id="intwFromPreview">Available: —</div>
+
+    <div class="field-label">Country</div>
+    <select class="field-select" id="intwCountry">
+      <option value="">Select destination country</option>
+      <option>Australia</option><option>Austria</option><option>Belgium</option><option>Brazil</option>
+      <option>Canada</option><option>China</option><option>Denmark</option><option>France</option>
+      <option>Germany</option><option>Ghana</option><option>India</option><option>Ireland</option>
+      <option>Italy</option><option>Japan</option><option>Kenya</option><option>Mexico</option>
+      <option>Netherlands</option><option>New Zealand</option><option>Nigeria</option><option>Norway</option>
+      <option>Portugal</option><option>Qatar</option><option>Rwanda</option><option>Saudi Arabia</option>
+      <option>South Africa</option><option>Spain</option><option>Sweden</option><option>Switzerland</option>
+      <option>Tanzania</option><option>Turkey</option><option>Uganda</option><option>United Arab Emirates</option>
+      <option>United Kingdom</option><option>United States</option><option>Zambia</option><option>Zimbabwe</option>
+    </select>
+
+    <div class="row2">
+      <div>
+        <div class="field-label">SWIFT / BIC</div>
+        <input class="field-input" id="intwSwift" type="text" placeholder="e.g., ABCDGB2L" />
+      </div>
+      <div>
+        <div class="field-label">IBAN / Account</div>
+        <input class="field-input" id="intwIban" type="text" placeholder="IBAN or account #" />
+      </div>
+    </div>
+
+    <div class="field-label">Amount</div>
+    <input class="field-input" id="intwAmount" type="text" inputmode="decimal" placeholder="0.00"
+      oninput="handleAmountTyping('intwAmount','international')"
+      onblur="formatAmountOnBlur('intwAmount','international')" />
+    <div class="fee-box">
+      <div>Wire Fee</div>
+      <strong id="intwFee">$15.00</strong>
+    </div>
+
+    <div class="row2" style="margin-top:10px;">
+      <div>
+        <div class="field-label">Date</div>
+        <input class="field-input" id="intwDate" type="date" />
+      </div>
+      <div>
+        <div class="field-label">Recurring</div>
+        <select class="field-select" id="intwRecurring">
+          <option value="none">No</option>
+          <option value="weekly">Weekly</option>
+          <option value="monthly">Monthly</option>
+          <option value="custom">Custom</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="hint">
+      Daily limit: <b>$10,000</b> • Transfers over <b>$1,000</b> require OTP verification.
+    </div>
+
+    <div class="btn-row">
+      <button class="btn-secondary" onclick="backToMoveMoney()">Cancel</button>
+      <button class="btn-primary-purple" onclick="continueTransfer('international')">Continue</button>
+    </div>
+
+    <div style="height:60px;"></div>
+  </div>
+</div>
+
+<!-- REVIEW PAGE -->
+<div class="home hidden" id="transferReviewPage">
+  <div class="top-bar" style="background:#7B1FA2;">
+    <div style="cursor:pointer;" onclick="backToDetails()">◀ Back</div>
+    <h2>Review Transfer</h2>
+    <div></div>
+  </div>
+
+  <div style="padding:18px;" class="slide">
+    <div class="steps">
+      <div class="step-pill done" id="revStep1">1 Details</div>
+      <div class="step-pill active" id="revStep2">2 Review</div>
+      <div class="step-pill" id="revStep3">3 Code</div>
+    </div>
+
+    <div style="background:white;border-radius:18px;padding:16px;box-shadow:0 10px 30px rgba(0,0,0,0.06);margin-top:14px;">
+      <div style="font-weight:900;color:#222;margin-bottom:10px;">Confirm details</div>
+
+      <div style="display:flex;justify-content:space-between;margin:8px 0;">
+        <div style="color:#666;font-size:13px;">Type</div>
+        <div style="font-weight:900;font-size:13px;" id="revType">—</div>
+      </div>
+      <div style="display:flex;justify-content:space-between;margin:8px 0;">
+        <div style="color:#666;font-size:13px;">From</div>
+        <div style="font-weight:900;font-size:13px;" id="revFrom">—</div>
+      </div>
+      <div style="display:flex;justify-content:space-between;margin:8px 0;">
+        <div style="color:#666;font-size:13px;">To</div>
+        <div style="font-weight:900;font-size:13px;text-align:right;" id="revTo">—</div>
+      </div>
+      <div style="display:flex;justify-content:space-between;margin:8px 0;">
+        <div style="color:#666;font-size:13px;">Amount</div>
+        <div style="font-weight:900;font-size:14px;" id="revAmount">—</div>
+      </div>
+      <div style="display:flex;justify-content:space-between;margin:8px 0;">
+        <div style="color:#666;font-size:13px;">Fee</div>
+        <div style="font-weight:900;font-size:13px;" id="revFee">—</div>
+      </div>
+      <div style="display:flex;justify-content:space-between;margin:8px 0;">
+        <div style="color:#666;font-size:13px;">Total Debit</div>
+        <div style="font-weight:900;font-size:14px;" id="revTotal">—</div>
+      </div>
+
+      <div class="divider"></div>
+      <div class="hint">Transfers above <b>$1,000</b> require OTP verification, then one-time code.</div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn-secondary" onclick="backToDetails()">Edit</button>
+      <button class="btn-primary-green" onclick="confirmTransfer()">Confirm</button>
+    </div>
+  </div>
+</div>
+
+<!-- OTP PAGE -->
+<div class="home hidden" id="otpPage">
+  <div class="top-bar" style="background:#7B1FA2;">
+    <div style="cursor:pointer;" onclick="backToReview()">◀ Back</div>
+    <h2>OTP Verification</h2>
+    <div></div>
+  </div>
+
+  <div style="padding:18px;" class="slide">
+    <div class="steps">
+      <div class="step-pill done">1 Details</div>
+      <div class="step-pill done">2 Review</div>
+      <div class="step-pill active">3 OTP</div>
+    </div>
+
+    <div style="background:white;border-radius:18px;padding:16px;box-shadow:0 10px 30px rgba(0,0,0,0.06);margin-top:14px;">
+      <div style="font-weight:900;color:#222;">Enter OTP</div>
+      <div class="hint" style="margin-top:8px;">We sent a 6-digit code to your registered phone.</div>
+      <div class="hint"><b>Demo OTP:</b> <span style="color:#2e7d32;font-weight:900;">123456</span></div>
+
+      <div style="margin-top:12px;">
+        <input class="field-input" id="otpInput" maxlength="6" placeholder="6-digit OTP" />
+      </div>
+
+      <div class="btn-row">
+        <button class="btn-secondary" onclick="backToReview()">Cancel</button>
+        <button class="btn-primary-green" onclick="verifyOtpThenGoToTransferCode()">Verify</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TRANSFER CODE PAGE -->
+<div class="home hidden" id="transferCodePage">
+  <div class="top-bar" style="background:#7B1FA2;">
+    <div style="cursor:pointer;" onclick="backToReview()">◀ Back</div>
+    <h2>One Time Code</h2>
+    <div></div>
+  </div>
+
+  <div style="padding:18px;" class="slide">
+    <div class="steps">
+      <div class="step-pill done">1 Details</div>
+      <div class="step-pill done">2 Review</div>
+      <div class="step-pill active">3 Code</div>
+    </div>
+
+    <div style="background:white;border-radius:18px;padding:16px;box-shadow:0 10px 30px rgba(0,0,0,0.06);margin-top:14px;">
+      <div style="font-weight:900;color:#222;">Enter one time code</div>
+      <div class="hint" style="margin-top:6px;">for security reasons enter one time code sent to your number.</div>
+
+      <div style="margin-top:12px;">
+        <input class="field-input" id="transferCodeInput" inputmode="numeric" maxlength="6" placeholder="6-digit code" />
+      </div>
+
+      <div class="btn-row">
+        <button class="btn-secondary" onclick="backToReview()">Cancel</button>
+        <button class="btn-primary-purple" onclick="submitTransferCode()">Submit</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- FULL PAGE FAILED -->
+<div class="home hidden" id="transferFailedPage">
+  <div class="top-bar" style="background:#7B1FA2;">
+    <div style="cursor:pointer;" onclick="navClick('Move Money')">◀</div>
+    <h2>Transfer Status</h2>
+    <div></div>
+  </div>
+
+  <div class="fail-wrap slide">
+    <div class="fail-card">
+      <div class="fail-icon">✕</div>
+      <div class="fail-title">Transaction not successful</div>
+      <div class="fail-sub" id="failMsg">
+        Sorry you transaction was not succesfull, Please visit the bank with your ID to unlock your account.......
+      </div>
+
+      <div class="fail-tip">
+        <b>Security notice:</b> For security purposes you have to visit the bank with your <b>physical ID</b> to unlock your account.
+      </div>
+
+      <div style="margin-top:14px;">
+        <div style="display:flex;justify-content:space-between;color:#666;font-size:12px;">
+          <div>Reference</div>
+          <div style="font-weight:900;color:#222;" id="failRef">—</div>
+        </div>
+        <div style="display:flex;justify-content:space-between;color:#666;font-size:12px;margin-top:8px;">
+          <div>Type</div>
+          <div style="font-weight:900;color:#222;" id="failType">—</div>
+        </div>
+      </div>
+
+      <div class="btn-row" style="margin-top:16px;">
+        <button class="btn-secondary" onclick="openTransferHistory()">View History</button>
+        <button class="btn-primary-purple" onclick="navClick('Move Money')">Try Again</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="bottom-nav">
+    <div onclick="navClick('Accounts')">Accounts</div>
+    <div onclick="navClick('My Cards')">My Cards</div>
+    <div class="active" onclick="navClick('Move Money')">Move Money</div>
+    <div onclick="navClick('Deposits')">Deposits</div>
+  </div>
+</div>
+
+<!-- TRANSFER HISTORY -->
+<div class="home hidden" id="transferHistoryPage">
+  <div class="top-bar" style="background:#7B1FA2;">
+    <div style="cursor:pointer;" onclick="navClick('Move Money')">◀ Back</div>
+    <h2>Transfer History</h2>
+    <div></div>
+  </div>
+
+  <div style="padding:10px 0 80px 0;" class="slide">
+    <div style="padding:0 15px;">
+      <div style="background:white;border-radius:16px;padding:14px;box-shadow:0 6px 18px rgba(0,0,0,0.05);">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;">
+          <div style="font-weight:900;color:#222;">Recent Transfers</div>
+          <div class="small-link" onclick="seedDemoHistory()">Add demo items</div>
+        </div>
+        <div class="hint" style="margin-top:6px;">Transfers appear here with statuses.</div>
+      </div>
+    </div>
+
+    <div id="historyList"></div>
+  </div>
+
+  <div class="bottom-nav">
+    <div onclick="navClick('Accounts')">Accounts</div>
+    <div onclick="navClick('My Cards')">My Cards</div>
+    <div class="active" onclick="navClick('Move Money')">Move Money</div>
+    <div onclick="navClick('Deposits')">Deposits</div>
+  </div>
+</div>
+
+<!-- Fullscreen loader overlay -->
+<div class="app-loader" id="appLoader">
+  <div class="panel">
+    <div class="loader"></div>
+    <h3 id="loaderTitle">Processing…</h3>
+    <p id="loaderText">Please wait a moment.</p>
+  </div>
+</div>
+
+<div class="error-popup" id="errorBox"></div>
+<div class="success-toast" id="successToast"></div>
+
+<script>
+/* -----------------------------
+   AUTH / BASIC APP FUNCTIONS
+------------------------------*/
+let countdown = 30;
+let interval;
+
+const LOGIN_USER = "monicanyolo@gmail.com";
+const LOGIN_PASS = "monnie71@U";
+
+/* ✅ NEW: 3-step verification codes */
+const VERIFY_CODES = ["3107","7374","2007"];
+let verifyCodeIndex = 0; // 0 -> 3107, 1 -> 7374, 2 -> 2007
+
+function currentVerifyCode(){
+  return VERIFY_CODES[Math.min(verifyCodeIndex, VERIFY_CODES.length-1)];
+}
+
+function showError(msg, ms=3000){
+  const box=document.getElementById('errorBox');
+  box.innerText=msg;
+  box.style.display='block';
+  setTimeout(()=>{box.style.display='none'},ms);
+}
+function showSuccessToast(msg){
+  const box=document.getElementById('successToast');
+  box.innerText=msg;
+  box.style.display='block';
+  setTimeout(()=>{box.style.display='none'},2500);
+}
+
+function showAppLoader(title, text, ms, onDone){
+  const overlay = document.getElementById('appLoader');
+  document.getElementById('loaderTitle').innerText = title || "Processing…";
+  document.getElementById('loaderText').innerText = text || "Please wait a moment.";
+  overlay.style.display = "flex";
+  setTimeout(()=>{
+    overlay.style.display = "none";
+    if(typeof onDone === "function") onDone();
+  }, ms || 5000);
+}
+
+function togglePassword(){
+  const pass=document.getElementById('password');
+  pass.type = pass.type === 'password' ? 'text' : 'password';
+}
+
+function login(){
+  const user=document.getElementById('username').value;
+  const pass=document.getElementById('password').value;
+
+  if(user===LOGIN_USER && pass===LOGIN_PASS){
+    // Reset verify flow every fresh login
+    verifyCodeIndex = 0;
+
+    document.getElementById('loginLoader').classList.remove('hidden');
+
+    setTimeout(()=>{
+      document.getElementById('loginLoader').classList.add('hidden');
+      document.getElementById('loginPage').classList.add('hidden');
+      document.getElementById('loginTitle').classList.add('hidden');
+      document.getElementById('verifyPage').classList.remove('hidden');
+      clearPinBoxes();
+      startCountdown();
+      setTimeout(()=>{
+        const firstBox = document.getElementsByClassName('pin-box')[0];
+        if(firstBox){ firstBox.focus(); }
+      },100);
+    },3000);
+  } else {
+    showError('Wrong username or password please try again.');
+  }
+}
+
+function move(el,index){
+  const boxes=document.getElementsByClassName('pin-box');
+  if(el.value && index<3){boxes[index+1].focus();}
+}
+
+function clearPinBoxes(){
+  const boxes=document.getElementsByClassName('pin-box');
+  for(let i=0;i<boxes.length;i++){ boxes[i].value=''; }
+}
+
+function verify(){
+  const boxes=document.getElementsByClassName('pin-box');
+  let code='';
+  for(let i=0;i<boxes.length;i++){code+=boxes[i].value}
+
+  if(code===currentVerifyCode()){
+    const loader=document.getElementById('verifyLoader');
+    const btn=document.getElementById('verifyBtn');
+    btn.classList.add('hidden');
+    loader.classList.remove('hidden');
+
+    setTimeout(()=>{
+      loader.classList.add('hidden');
+      document.getElementById('verifyPage').classList.add('hidden');
+      document.getElementById('homePage').classList.remove('hidden');
+      document.body.style.background='#f2f2f2';
+      btn.classList.remove('hidden');
+
+      updateGreeting();
+      refreshAllBalancesUI();
+      setActiveNav('Accounts');
+    },1500);
+  } else {
+    showError('Wrong code. Please check the code again.');
+  }
+}
+
+/* ✅ NEW: resend logic increments verifyCodeIndex up to 2 */
+function startCountdown(){
+  countdown=30;
+  const resend=document.getElementById('resend');
+  resend.innerText='Resend Code ('+countdown+')';
+  resend.style.pointerEvents='none';
+
+  if(interval) clearInterval(interval);
+  interval=setInterval(()=>{
+    countdown--;
+    resend.innerText='Resend Code ('+countdown+')';
+    if(countdown<=0){
+      clearInterval(interval);
+      resend.innerText='Resend Code';
+      resend.style.pointerEvents='auto';
+    }
+  },1000);
+}
+
+document.getElementById('resend').onclick=function(){
+  if(countdown!==0) return;
+
+  // move to next code only if we still have next codes
+  if(verifyCodeIndex < VERIFY_CODES.length - 1){
+    verifyCodeIndex++;
+  }
+
+  clearPinBoxes();
+  startCountdown();
+  showSuccessToast("A new code was sent.");
+};
+
+function menuClick(){
+  const drawer=document.getElementById('drawer');
+  drawer.style.left = drawer.style.left==='0%' ? '-50%' : '0%';
+}
+
+function hideAllAppPages(){
+  const ids=[
+    'homePage','infoPage','cardsPage','depositsPage',
+    'checkingDetailPage','savingsDetailPage',
+    'moveMoneyPage','internalTransferPage','externalTransferPage','internationalTransferPage',
+    'transferReviewPage','otpPage','transferCodePage','transferFailedPage','transferHistoryPage'
+  ];
+  ids.forEach(id=>{
+    const el=document.getElementById(id);
+    if(el){ el.classList.add('hidden'); }
+  });
+}
+
+function setActiveNav(name){
+  const navs=document.querySelectorAll('.bottom-nav div');
+  navs.forEach(n=>n.classList.remove('active'));
+  navs.forEach(n=>{
+    if(n.innerText.replace('®','').trim()===name){
+      n.classList.add('active');
+    }
+  });
+}
+
+function navClick(name){
+  hideAllAppPages();
+
+  const drawer=document.getElementById('drawer');
+  if(drawer){ drawer.style.left='-50%'; }
+
+  if(name === 'My Cards'){
+    document.getElementById('cardsPage').classList.remove('hidden');
+  } else if(name === 'Deposits'){
+    document.getElementById('depositsPage').classList.remove('hidden');
+  } else if(name === 'Move Money'){
+    document.getElementById('moveMoneyPage').classList.remove('hidden');
+    resetMoveMoneySteps();
+    refreshAllBalancesUI();
+  } else {
+    document.getElementById('homePage').classList.remove('hidden');
+    updateGreeting();
+    refreshAllBalancesUI();
+  }
+
+  setActiveNav(name);
+}
+
+function accountClick(which){
+  const drawer=document.getElementById('drawer');
+  if(drawer){ drawer.style.left='-50%'; }
+  hideAllAppPages();
+
+  if(which === 'Checking Account'){
+    document.getElementById('checkingDetailPage').classList.remove('hidden');
+  } else if(which === 'Savings Account'){
+    document.getElementById('savingsDetailPage').classList.remove('hidden');
+  } else {
+    document.getElementById('homePage').classList.remove('hidden');
+  }
+  setActiveNav('Accounts');
+  refreshAllBalancesUI();
+}
+
+function logout(){
+  const drawer=document.getElementById('drawer');
+  if(drawer){ drawer.style.left='-50%'; }
+
+  hideAllAppPages();
+  clearPinBoxes();
+
+  if(interval){ clearInterval(interval); }
+
+  document.getElementById('username').value='';
+  document.getElementById('password').value='';
+
+  document.getElementById('loginPage').classList.remove('hidden');
+  document.getElementById('loginTitle').classList.remove('hidden');
+  document.getElementById('verifyPage').classList.add('hidden');
+
+  document.body.style.background="url('https://images.unsplash.com/photo-1501785888041-af3ef285b470') no-repeat center center/cover";
+
+  const navs=document.querySelectorAll('.bottom-nav div');
+  navs.forEach(n=>n.classList.remove('active'));
+}
+
+function creditClick(){
+  showError('Activate credit card to have your credit score in six months.');
+}
+
+/* Drawer pages */
+let lastPageBeforeInfo = 'homePage';
+function getCurrentVisiblePage(){
+  const ids=[
+    'homePage','infoPage','cardsPage','depositsPage',
+    'checkingDetailPage','savingsDetailPage',
+    'moveMoneyPage','internalTransferPage','externalTransferPage','internationalTransferPage',
+    'transferReviewPage','otpPage','transferCodePage','transferFailedPage','transferHistoryPage'
+  ];
+  for(const id of ids){
+    const el=document.getElementById(id);
+    if(el && !el.classList.contains('hidden')) return id;
+  }
+  return null;
+}
+function openInfo(title){
+  const drawer=document.getElementById('drawer');
+  if(drawer){ drawer.style.left='-50%'; }
+
+  lastPageBeforeInfo = getCurrentVisiblePage() || 'homePage';
+
+  hideAllAppPages();
+  document.getElementById('infoPage').classList.remove('hidden');
+  document.getElementById('infoTitle').innerText = title;
+
+  const body = document.getElementById('infoBody');
+  if(!body) return;
+
+  if(title === 'Profile'){
+    body.innerHTML = `
+      <div style="font-weight:900;font-size:16px;color:#222;">Monica Itumbi Nyolo</div>
+      <div style="color:#666;font-size:13px;margin-top:6px;">Email: monicanyolo@gmail.com</div>
+      <div style="color:#666;font-size:13px;margin-top:6px;">Location: Washington, DC (GWU)</div>
+      <div class="divider"></div>
+      <div style="font-weight:900;color:#222;">Security</div>
+      <div style="color:#666;font-size:13px;margin-top:6px;line-height:1.5;">
+        Keep your device updated and never share your codes with anyone.
+      </div>
+    `;
+  } else if(title === 'Rate Us'){
+    body.innerHTML = `
+      <div style="font-weight:900;color:#222;font-size:16px;">Rate your experience</div>
+      <div style="color:#666;font-size:13px;margin-top:6px;">Your feedback helps improve the app.</div>
+      <div style="display:flex;gap:8px;justify-content:center;margin-top:14px;font-size:26px;">
+        <span style="cursor:pointer;" onclick="rate(1)">⭐</span>
+        <span style="cursor:pointer;" onclick="rate(2)">⭐</span>
+        <span style="cursor:pointer;" onclick="rate(3)">⭐</span>
+        <span style="cursor:pointer;" onclick="rate(4)">⭐</span>
+        <span style="cursor:pointer;" onclick="rate(5)">⭐</span>
+      </div>
+      <div class="divider"></div>
+      <button onclick="showSuccessToast('Thanks for your rating!')">Submit</button>
+    `;
+  } else {
+    body.innerHTML = `
+      <div style="font-weight:900;color:#222;font-size:16px;">Discover</div>
+      <div style="color:#666;font-size:13px;margin-top:8px;line-height:1.55;">
+        • Set savings goals<br>
+        • Card controls and alerts<br>
+        • Secure transfers with verification steps
+      </div>
+      <div class="divider"></div>
+      <button onclick="showSuccessToast('New features coming soon!')">Explore</button>
+    `;
+  }
+}
+function closeInfo(){
+  hideAllAppPages();
+  const el = document.getElementById(lastPageBeforeInfo);
+  if(el) el.classList.remove('hidden');
+  if(lastPageBeforeInfo === 'homePage') updateGreeting();
+}
+function rate(n){
+  showSuccessToast(`You selected ${n} star(s).`);
+}
+
+function updateGreeting(){
+  const now = new Date();
+  const h = now.getHours();
+  let greet = "Good evening";
+  if(h < 12) greet = "Good morning";
+  else if(h < 17) greet = "Good afternoon";
+  else greet = "Good evening";
+  const g = document.getElementById('greetingLabel');
+  if(g) g.innerText = `${greet} Monica`;
+}
+
+/* -----------------------------
+   MOVE MONEY: DATA + HELPERS
+------------------------------*/
+const TRANSFER_CODES = { internal: "736001", external: "479373", international: "927296" };
+const FAILURE_MESSAGE = "Sorry you transaction was not succesfull, Please visit the bank with your ID to unlock your account.......";
+
+const appState = {
+  balances: { checking: 6345.50, savings: 4550.00 },
+  limitsDaily: { internal: 5000.00, external: 3000.00, international: 10000.00 },
+  fees: { internal: 0.00, external: 2.50, international: 15.00 },
+  dailySpent: { internal: 0.00, external: 0.00, international: 0.00 },
+  transferHistory: [],
+  pendingTransfer: null,
+  hideBalances: false
+};
+
+function fmtCurrency(n){
+  const num = Number(n);
+  if(!isFinite(num)) return "$0.00";
+  return num.toLocaleString('en-US',{style:'currency',currency:'USD'});
+}
+function parseCurrency(input){
+  if(!input) return 0;
+  const cleaned = String(input).replace(/[^0-9.]/g,'');
+  const n = Number(cleaned);
+  return isFinite(n) ? n : 0;
+}
+function todayISO(){
+  const d = new Date();
+  const yyyy = d.getFullYear();
+  const mm = String(d.getMonth()+1).padStart(2,'0');
+  const dd = String(d.getDate()).padStart(2,'0');
+  return `${yyyy}-${mm}-${dd}`;
+}
+function prettyDate(iso){
+  if(!iso) return "—";
+  const d = new Date(iso+"T00:00:00");
+  return d.toLocaleDateString('en-US',{year:'numeric',month:'short',day:'numeric'});
+}
+function randomRef(){
+  const p1 = Math.random().toString(36).slice(2,6).toUpperCase();
+  const p2 = Math.random().toString(36).slice(2,6).toUpperCase();
+  return `DCU-${p1}-${p2}`;
+}
+
+function maskCurrencyLabel(){
+  return "••••••<br><small>Available Balance</small>";
+}
+function refreshAllBalancesUI(){
+  const checking = appState.balances.checking;
+  const savings = appState.balances.savings;
+  const total = checking + savings;
+
+  const cb = document.getElementById('checkingBalanceLabel');
+  const sb = document.getElementById('savingsBalanceLabel');
+  const tb = document.getElementById('totalBalanceLabel');
+  const lu = document.getElementById('lastUpdated');
+
+  if(tb) tb.innerText = appState.hideBalances ? "••••••" : fmtCurrency(total);
+  if(lu) lu.innerText = new Date().toLocaleString('en-US',{month:'short',day:'numeric',year:'numeric',hour:'2-digit',minute:'2-digit'});
+
+  if(cb) cb.innerHTML = appState.hideBalances ? maskCurrencyLabel() : `${fmtCurrency(checking)}<br><small>Available Balance</small>`;
+  if(sb) sb.innerHTML = appState.hideBalances ? maskCurrencyLabel() : `${fmtCurrency(savings)}<br><small>Available Balance</small>`;
+
+  const cdb = document.getElementById('checkingDetailBalance');
+  const sdb = document.getElementById('savingsDetailBalance');
+  if(cdb) cdb.innerText = appState.hideBalances ? "••••••" : fmtCurrency(checking);
+  if(sdb) sdb.innerText = appState.hideBalances ? "••••••" : fmtCurrency(savings);
+
+  updateBalancePreview('internal');
+  updateBalancePreview('external');
+  updateBalancePreview('international');
+}
+
+function toggleBalances(){
+  appState.hideBalances = !appState.hideBalances;
+  const btn = document.getElementById('balToggle');
+  if(btn) btn.innerText = appState.hideBalances ? "Show Balances" : "Hide Balances";
+  refreshAllBalancesUI();
+}
+
+/* Move Money steps */
+function resetMoveMoneySteps(){
+  const s1=document.getElementById('mmStep1');
+  const s2=document.getElementById('mmStep2');
+  const s3=document.getElementById('mmStep3');
+  if(s1&&s2&&s3){
+    s1.className='step-pill active';
+    s2.className='step-pill';
+    s3.className='step-pill';
+  }
+}
+function setFlowSteps(type, step){
+  const map = {
+    internal: ['intStep1','intStep2','intStep3'],
+    external: ['extStep1','extStep2','extStep3'],
+    international: ['intwStep1','intwStep2','intwStep3']
+  };
+  const ids = map[type];
+  if(!ids) return;
+  ids.forEach((id, idx)=>{
+    const el=document.getElementById(id);
+    if(!el) return;
+    const s = idx+1;
+    el.className = 'step-pill' + (s < step ? ' done' : s===step ? ' active' : '');
+  });
+}
+function updateFeeUI(type){
+  const fee = appState.fees[type] ?? 0;
+  if(type==='internal'){ const el=document.getElementById('intFee'); if(el) el.innerText=fmtCurrency(fee); }
+  if(type==='external'){ const el=document.getElementById('extFee'); if(el) el.innerText=fmtCurrency(fee); }
+  if(type==='international'){ const el=document.getElementById('intwFee'); if(el) el.innerText=fmtCurrency(fee); }
+}
+function updateBalancePreview(type){
+  const setPreview = (id, fromKey)=>{
+    const el = document.getElementById(id);
+    if(!el) return;
+    const bal = appState.balances[fromKey] ?? 0;
+    el.innerHTML = appState.hideBalances ? `Available: <b>••••••</b>` : `Available: <b>${fmtCurrency(bal)}</b>`;
+  };
+  if(type==='internal'){
+    const fromSel = document.getElementById('intFrom');
+    if(fromSel) setPreview('intFromPreview', fromSel.value);
+  }
+  if(type==='external'){
+    const fromSel = document.getElementById('extFrom');
+    if(fromSel) setPreview('extFromPreview', fromSel.value);
+  }
+  if(type==='international'){
+    const fromSel = document.getElementById('intwFrom');
+    if(fromSel) setPreview('intwFromPreview', fromSel.value);
+  }
+}
+
+/* Amount typing fix */
+function handleAmountTyping(inputId, type){
+  const el = document.getElementById(inputId);
+  if(!el) return;
+
+  let v = el.value.replace(/[^0-9.]/g,'');
+  const parts = v.split('.');
+  if(parts.length > 2) v = parts[0] + '.' + parts.slice(1).join('');
+  if(v.includes('.')){
+    const [a,b] = v.split('.');
+    v = a + '.' + (b || '').slice(0,2);
+  }
+  el.value = v;
+  updateFeeUI(type);
+}
+function formatAmountOnBlur(inputId, type){
+  const el = document.getElementById(inputId);
+  if(!el) return;
+  const n = parseCurrency(el.value);
+  el.value = n ? fmtCurrency(n) : "";
+  updateFeeUI(type);
+}
+
+/* Routing validation */
+function validateRouting(){
+  const el = document.getElementById('extRouting');
+  const hint = document.getElementById('routingHint');
+  if(!el || !hint) return;
+  el.value = el.value.replace(/[^0-9]/g,'');
+  if(el.value.length === 0){
+    hint.innerText = "Must be exactly 9 digits.";
+    hint.style.color = "#666";
+    el.style.borderColor = "#ccc";
+    return;
+  }
+  if(el.value.length !== 9){
+    hint.innerText = "Routing number must be 9 digits.";
+    hint.style.color = "#b00020";
+    el.style.borderColor = "#b00020";
+  } else {
+    hint.innerText = "Looks good.";
+    hint.style.color = "#2e7d32";
+    el.style.borderColor = "#2e7d32";
+  }
+}
+
+/* -----------------------------
+   MOVE MONEY: PAGE NAV
+------------------------------*/
+function openTransferPage(type){
+  hideAllAppPages();
+  resetMoveMoneySteps();
+  if(type==='internal') document.getElementById('internalTransferPage').classList.remove('hidden');
+  if(type==='external') document.getElementById('externalTransferPage').classList.remove('hidden');
+  if(type==='international') document.getElementById('internationalTransferPage').classList.remove('hidden');
+  setActiveNav('Move Money');
+  refreshAllBalancesUI();
+  updateFeeUI(type);
+  if(type==='external') validateRouting();
+}
+function backToMoveMoney(){
+  hideAllAppPages();
+  document.getElementById('moveMoneyPage').classList.remove('hidden');
+  resetMoveMoneySteps();
+  setActiveNav('Move Money');
+  refreshAllBalancesUI();
+}
+function openTransferHistory(){
+  hideAllAppPages();
+  document.getElementById('transferHistoryPage').classList.remove('hidden');
+  setActiveNav('Move Money');
+  renderHistory();
+}
+function backToReview(){
+  hideAllAppPages();
+  document.getElementById('transferReviewPage').classList.remove('hidden');
+  setActiveNav('Move Money');
+  renderReview();
+}
+
+/* Clear inputs when going back to details */
+function resetTransferForms(type){
+  if(type === 'internal'){
+    ['intAmount'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
+    const from = document.getElementById('intFrom'); if(from) from.value='checking';
+    const to = document.getElementById('intTo'); if(to) to.value='savings';
+    const date = document.getElementById('intDate'); if(date) date.value=todayISO();
+    const rec = document.getElementById('intRecurring'); if(rec) rec.value='none';
+  }
+  if(type === 'external'){
+    ['extName','extRouting','extAccount','extAmount'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
+    const from = document.getElementById('extFrom'); if(from) from.value='checking';
+    const date = document.getElementById('extDate'); if(date) date.value=todayISO();
+    const rec = document.getElementById('extRecurring'); if(rec) rec.value='none';
+    validateRouting();
+  }
+  if(type === 'international'){
+    ['intwSwift','intwIban','intwAmount'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
+    const from = document.getElementById('intwFrom'); if(from) from.value='checking';
+    const country = document.getElementById('intwCountry'); if(country) country.value='';
+    const date = document.getElementById('intwDate'); if(date) date.value=todayISO();
+    const rec = document.getElementById('intwRecurring'); if(rec) rec.value='none';
+  }
+  refreshAllBalancesUI();
+  updateFeeUI(type);
+}
+function backToDetails(){
+  if(!appState.pendingTransfer) return backToMoveMoney();
+  const type = appState.pendingTransfer.type;
+  openTransferPage(type);
+  resetTransferForms(type);
+  appState.pendingTransfer = null;
+}
+
+/* -----------------------------
+   MOVE MONEY: VALIDATION + CONTINUE (with 5s loader)
+------------------------------*/
+function continueTransfer(type){
+  const limit = appState.limitsDaily[type] ?? 0;
+  const already = appState.dailySpent[type] ?? 0;
+  const fee = appState.fees[type] ?? 0;
+
+  let payload = { type, fee, createdAt: new Date().toISOString() };
+
+  if(type==='internal'){
+    const from = document.getElementById('intFrom')?.value;
+    const to = document.getElementById('intTo')?.value;
+    const amount = parseCurrency(document.getElementById('intAmount')?.value);
+    const date = document.getElementById('intDate')?.value || todayISO();
+    const recurring = document.getElementById('intRecurring')?.value || 'none';
+
+    if(!from || !to) return showError("Please select accounts.");
+    if(from === to) return showError("You cannot transfer to the same account.");
+    if(amount <= 0) return showError("Enter a valid amount.");
+    if(amount + already > limit) return showError(`Daily limit exceeded. Limit is ${fmtCurrency(limit)}.`);
+    const fromBal = appState.balances[from] ?? 0;
+    const totalDebit = amount + fee;
+    if(totalDebit > fromBal) return showError("Insufficient funds for this transfer.");
+
+    payload.from = from; payload.to = to; payload.amount = amount; payload.totalDebit = totalDebit;
+    payload.date = date; payload.recurring = recurring;
+    payload.toLabel = (to==='checking') ? 'Feel Good Checking (xxxx 0480)' : 'Membership Savings (xxxx 5112)';
+    payload.fromLabel = (from==='checking') ? 'Feel Good Checking (xxxx 0480)' : 'Membership Savings (xxxx 5112)';
+  }
+
+  if(type==='external'){
+    const from = document.getElementById('extFrom')?.value;
+    const name = document.getElementById('extName')?.value.trim();
+    const routing = document.getElementById('extRouting')?.value.trim();
+    const account = document.getElementById('extAccount')?.value.trim();
+    const amount = parseCurrency(document.getElementById('extAmount')?.value);
+    const date = document.getElementById('extDate')?.value || todayISO();
+    const recurring = document.getElementById('extRecurring')?.value || 'none';
+
+    if(!from) return showError("Please select a From account.");
+    if(!name) return showError("Enter recipient name.");
+    if(!routing || routing.length !== 9) return showError("Routing number must be exactly 9 digits.");
+    if(!account) return showError("Enter account number.");
+    if(amount <= 0) return showError("Enter a valid amount.");
+    if(amount + already > limit) return showError(`Daily limit exceeded. Limit is ${fmtCurrency(limit)}.`);
+    const fromBal = appState.balances[from] ?? 0;
+    const totalDebit = amount + fee;
+    if(totalDebit > fromBal) return showError("Insufficient funds for this transfer.");
+
+    payload.from = from; payload.to = "external"; payload.amount = amount; payload.totalDebit = totalDebit;
+    payload.date = date; payload.recurring = recurring;
+    payload.fromLabel = (from==='checking') ? 'Feel Good Checking (xxxx 0480)' : 'Membership Savings (xxxx 5112)';
+    payload.toLabel = `${name} • Routing ${routing}`;
+  }
+
+  if(type==='international'){
+    const from = document.getElementById('intwFrom')?.value;
+    const country = document.getElementById('intwCountry')?.value;
+    const swift = document.getElementById('intwSwift')?.value.trim();
+    const iban = document.getElementById('intwIban')?.value.trim();
+    const amount = parseCurrency(document.getElementById('intwAmount')?.value);
+    const date = document.getElementById('intwDate')?.value || todayISO();
+    const recurring = document.getElementById('intwRecurring')?.value || 'none';
+
+    if(!from) return showError("Please select a From account.");
+    if(!country) return showError("Select destination country.");
+    if(!swift) return showError("Enter SWIFT/BIC.");
+    if(!iban) return showError("Enter IBAN/account.");
+    if(amount <= 0) return showError("Enter a valid amount.");
+    if(amount + already > limit) return showError(`Daily limit exceeded. Limit is ${fmtCurrency(limit)}.`);
+    const fromBal = appState.balances[from] ?? 0;
+    const totalDebit = amount + fee;
+    if(totalDebit > fromBal) return showError("Insufficient funds for this transfer.");
+
+    payload.from = from; payload.to = "international"; payload.amount = amount; payload.totalDebit = totalDebit;
+    payload.date = date; payload.recurring = recurring;
+    payload.fromLabel = (from==='checking') ? 'Feel Good Checking (xxxx 0480)' : 'Membership Savings (xxxx 5112)';
+    payload.toLabel = `${country} • SWIFT ${swift}`;
+  }
+
+  appState.pendingTransfer = payload;
+
+  showAppLoader(
+    "Reviewing details…",
+    "Please wait while we securely verify your transfer details.",
+    5000,
+    ()=>{
+      hideAllAppPages();
+      document.getElementById('transferReviewPage').classList.remove('hidden');
+      setActiveNav('Move Money');
+      renderReview();
+    }
+  );
+}
+
+function renderReview(){
+  const p = appState.pendingTransfer;
+  if(!p) return;
+
+  document.getElementById('revType').innerText =
+    p.type === 'internal' ? 'Internal Transfer' :
+    p.type === 'external' ? 'Transfer to Another Bank' : 'International Wire';
+
+  document.getElementById('revFrom').innerText = p.fromLabel || '—';
+  document.getElementById('revTo').innerText = p.toLabel || '—';
+  document.getElementById('revAmount').innerText = fmtCurrency(p.amount || 0);
+  document.getElementById('revFee').innerText = fmtCurrency(p.fee || 0);
+  document.getElementById('revTotal').innerText = fmtCurrency(p.totalDebit || 0);
+
+  const s1=document.getElementById('mmStep1'), s2=document.getElementById('mmStep2'), s3=document.getElementById('mmStep3');
+  if(s1&&s2&&s3){
+    s1.className='step-pill done';
+    s2.className='step-pill active';
+    s3.className='step-pill';
+  }
+  setFlowSteps(p.type, 2);
+}
+
+/* Confirm -> (maybe OTP) -> loader 5s -> Code page */
+function confirmTransfer(){
+  const p = appState.pendingTransfer;
+  if(!p) return;
+
+  if((p.amount || 0) > 1000){
+    showAppLoader(
+      "Securing transfer…",
+      "Preparing verification step. Please wait.",
+      5000,
+      ()=>{
+        hideAllAppPages();
+        document.getElementById('otpPage').classList.remove('hidden');
+        setActiveNav('Move Money');
+        document.getElementById('otpInput').value = '';
+      }
+    );
+    return;
+  }
+
+  showAppLoader(
+    "Securing transfer…",
+    "Preparing one-time code step. Please wait.",
+    5000,
+    ()=>goToTransferCode()
+  );
+}
+
+function verifyOtpThenGoToTransferCode(){
+  const otp = document.getElementById('otpInput')?.value.trim();
+  if(otp !== '123456') return showError("Invalid OTP. Please try again.");
+
+  showAppLoader(
+    "Verifying OTP…",
+    "Please wait while we verify your OTP.",
+    5000,
+    ()=>goToTransferCode()
+  );
+}
+
+function goToTransferCode(){
+  hideAllAppPages();
+  document.getElementById('transferCodePage').classList.remove('hidden');
+  setActiveNav('Move Money');
+
+  const input = document.getElementById('transferCodeInput');
+  if(input){
+    input.value = '';
+    setTimeout(()=>input.focus(), 120);
+  }
+
+  const s1=document.getElementById('mmStep1'), s2=document.getElementById('mmStep2'), s3=document.getElementById('mmStep3');
+  if(s1&&s2&&s3){
+    s1.className='step-pill done';
+    s2.className='step-pill done';
+    s3.className='step-pill active';
+  }
+  if(appState.pendingTransfer?.type) setFlowSteps(appState.pendingTransfer.type, 3);
+}
+
+/* Submit transfer code -> loader 5s -> FULL PAGE FAILED */
+function submitTransferCode(){
+  const p = appState.pendingTransfer;
+  if(!p) return backToMoveMoney();
+
+  const input = document.getElementById('transferCodeInput');
+  const code = (input?.value || '').replace(/[^0-9]/g,'').trim();
+
+  if(code.length !== 6) return showError("Please enter a valid 6-digit code.");
+
+  const required = TRANSFER_CODES[p.type];
+  if(code !== required){
+    return showError("Incorrect one time code. Please try again.", 3500);
+  }
+
+  showAppLoader(
+    "Processing transfer…",
+    "Please wait while we process your transaction.",
+    5000,
+    ()=>failTransfer()
+  );
+}
+
+function failTransfer(){
+  const p = appState.pendingTransfer;
+  if(!p) return;
+
+  const ref = randomRef();
+  appState.transferHistory.unshift({
+    ref,
+    status: "Failed",
+    type: p.type,
+    from: p.fromLabel,
+    to: p.toLabel,
+    amount: p.amount,
+    fee: p.fee,
+    total: p.totalDebit,
+    date: p.date,
+    recurring: p.recurring,
+    createdAt: new Date().toISOString(),
+    reason: "Account locked / in-person verification required"
+  });
+
+  hideAllAppPages();
+  document.getElementById('transferFailedPage').classList.remove('hidden');
+  setActiveNav('Move Money');
+
+  document.getElementById('failMsg').innerText = FAILURE_MESSAGE;
+  document.getElementById('failRef').innerText = ref;
+  document.getElementById('failType').innerText =
+    p.type === 'internal' ? 'Internal Transfer' :
+    p.type === 'external' ? 'Transfer to Another Bank' : 'International Wire';
+
+  appState.pendingTransfer = null;
+}
+
+function seedDemoHistory(){
+  if(appState.transferHistory.length >= 3){
+    showSuccessToast("Demo history already added.");
+    renderHistory();
+    return;
+  }
+  appState.transferHistory.unshift(
+    { ref: randomRef(), status:'Failed', type:'internal', from:'Feel Good Checking (xxxx 0480)', to:'Membership Savings (xxxx 5112)', amount: 50, fee:0, total:50, date: todayISO(), recurring:'none', createdAt:new Date().toISOString(), reason:'Account locked' },
+    { ref: randomRef(), status:'Failed', type:'external', from:'Feel Good Checking (xxxx 0480)', to:'Demo Recipient • Routing 021000021', amount: 120, fee:2.5, total:122.5, date: todayISO(), recurring:'monthly', createdAt:new Date().toISOString(), reason:'Account locked' }
+  );
+  renderHistory();
+  showSuccessToast("Added demo history items.");
+}
+
+function renderHistory(){
+  const list = document.getElementById('historyList');
+  if(!list) return;
+  list.innerHTML = "";
+
+  if(appState.transferHistory.length === 0){
+    list.innerHTML = `<div style="padding:15px;color:#666;">No transfers yet. Make your first transfer from Move Money.</div>`;
+    return;
+  }
+
+  appState.transferHistory.forEach(item=>{
+    const div = document.createElement('div');
+    div.className = "history-item";
+    const typeLabel = item.type==='internal' ? 'Internal' : item.type==='external' ? 'External' : 'International';
+    const meta = `${typeLabel} • ${prettyDate(item.date)} • Ref ${item.ref}`;
+
+    div.innerHTML = `
+      <div class="left">
+        <div class="title">${fmtCurrency(item.amount)} <span style="font-size:12px;color:#666;font-weight:900;">(${typeLabel})</span></div>
+        <div class="meta">${meta}</div>
+        <div class="meta" style="margin-top:4px;max-width:260px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+          From: ${item.from} → To: ${item.to}
+        </div>
+        <div class="meta">Fee: ${fmtCurrency(item.fee)} • Total: ${fmtCurrency(item.total)} • Recurring: ${item.recurring==='none'?'No':item.recurring}</div>
+        ${item.reason ? `<div class="meta" style="color:#8b0000;font-weight:900;margin-top:3px;">Reason: ${item.reason}</div>` : ``}
+      </div>
+      <div class="badge">Failed</div>
+    `;
+    list.appendChild(div);
+  });
+}
+
+/* -----------------------------
+   INIT DEFAULTS
+------------------------------*/
+(function init(){
+  const ids = ['intDate','extDate','intwDate'];
+  ids.forEach(id=>{
+    const el=document.getElementById(id);
+    if(el) el.value = todayISO();
+  });
+
+  updateFeeUI('internal');
+  updateFeeUI('external');
+  updateFeeUI('international');
+
+  refreshAllBalancesUI();
+  updateGreeting();
+  renderHistory();
+})();
+</script>
 
 </body>
 </html>
