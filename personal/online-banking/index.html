@@ -1,21 +1,10 @@
 <!DOCTYPE html>
-<!-- Single-file (copy/paste into VS Code).
-
-ONLY NEW CHANGE in this version:
-✅ Verify (Enter verification code) now supports 3 sequential working codes:
-  1) Initial working code: 3107
-  2) After countdown ends and you click "Resend Code" (1st resend): working code becomes 7374
-  3) After the next countdown ends and you click "Resend Code" again (2nd resend): working code becomes 2007
-No further resends change the code.
-
-Everything else stays the same as the last code you approved.
--->
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>DC Credit Union/Online Banking</title>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+<title>DC Credit Union/Online-Banking</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&display=swap" rel="stylesheet">
 
 <style>
   *{margin:0;padding:0;box-sizing:border-box;font-family:'Poppins',sans-serif}
@@ -36,13 +25,14 @@ Everything else stays the same as the last code you approved.
     text-align:center;color:white;
   }
   .title-box h1{font-size:26px;font-weight:800}
-  .title-box p{font-size:14px;color:#00e0ff}
+  .title-box p{font-size:14px;color:#111}
 
   input{
     width:100%;padding:14px;margin:10px 0;border:none;border-radius:10px;
     background:rgba(255,255,255,0.15);color:white;font-size:15px;
     backdrop-filter:blur(10px);outline:none;
   }
+  input::placeholder{color:rgba(255,255,255,0.82)}
   .password-wrapper{position:relative}
   .password-wrapper input{padding-right:45px;}
   .toggle-eye{
@@ -69,6 +59,7 @@ Everything else stays the same as the last code you approved.
     position:fixed;bottom:20px;left:50%;transform:translateX(-50%);
     background:#2e7d32;color:white;padding:12px 20px;border-radius:10px;display:none;z-index:9999;
     box-shadow:0 10px 30px rgba(0,0,0,0.25);
+    max-width:92vw;
   }
 
   .loader{border:4px solid rgba(255,255,255,0.3);border-top:4px solid white;border-radius:50%;width:42px;height:42px;animation:spin 1s linear infinite;margin:20px auto}
@@ -80,7 +71,6 @@ Everything else stays the same as the last code you approved.
     text-align:center;font-size:22px;color:white;backdrop-filter:blur(8px)
   }
 
-  /* App pages */
   .home{background:#f2f2f2;width:100%;height:100%;overflow:auto;position:relative}
   .top-bar{background:#7B1FA2;color:white;padding:15px;display:flex;justify-content:space-between;align-items:center}
   .top-bar h2{font-size:18px;letter-spacing:1px}
@@ -94,15 +84,17 @@ Everything else stays the same as the last code you approved.
 
   .bottom-nav{
     position:fixed;bottom:0;width:100%;background:white;border-top:1px solid #ccc;
-    display:flex;justify-content:space-around;padding:8px 0;font-size:12px;z-index:900;
+    display:flex;justify-content:space-around;padding:8px 0;font-size:11px;z-index:900;
   }
-  .bottom-nav div{cursor:pointer;padding:5px 10px;border-radius:6px;transition:0.2s}
+  .bottom-nav div{
+    cursor:pointer;padding:5px 8px;border-radius:8px;transition:0.2s;display:flex;flex-direction:column;align-items:center;gap:2px;
+    min-width:58px;
+  }
   .bottom-nav div.active{background:#7B1FA2;color:#fff;}
   .menu-btn{cursor:pointer}
 
-  /* Side drawer */
   .side-drawer{
-    position:fixed;top:0;left:-50%;width:50%;height:100%;background:white;
+    position:fixed;top:0;left:-55%;width:55%;height:100%;background:white;
     box-shadow:2px 0 10px rgba(0,0,0,0.3);z-index:1000;transition:0.3s;
     padding:20px;overflow-y:auto;
   }
@@ -111,13 +103,11 @@ Everything else stays the same as the last code you approved.
   .drawer-item{padding:12px 0;border-bottom:1px solid #eee;cursor:pointer;font-weight:700}
   .drawer-item:hover{opacity:0.75}
 
-  /* Verification page */
   .countdown{
     background:white;color:#2e7d32;padding:10px;border-radius:10px;text-align:center;
     margin-top:15px;font-weight:600;cursor:pointer;
   }
 
-  /* Move Money */
   .mm-card{
     background:white;padding:18px;border-radius:16px;margin-bottom:14px;
     box-shadow:0 6px 18px rgba(0,0,0,0.06);cursor:pointer;
@@ -136,9 +126,10 @@ Everything else stays the same as the last code you approved.
   .security-banner small{display:block;color:#555;font-weight:500}
 
   .field-label{font-weight:900;margin:10px 0 6px 0;color:#333}
-  .field-input, .field-select{
+  .field-input, .field-select, textarea{
     width:100%;padding:12px;border-radius:10px;border:1px solid #ccc;background:white;color:black;outline:none;
   }
+  textarea{resize:none;min-height:84px}
   .hint{font-size:12px;color:#666;margin-top:6px;line-height:1.3}
   .row2{display:flex;gap:12px}
   .row2 > div{flex:1}
@@ -174,7 +165,6 @@ Everything else stays the same as the last code you approved.
   .divider{height:1px;background:#eee;margin:12px 0}
   .small-link{color:#6b8e23;font-weight:900;cursor:pointer;font-size:12px}
 
-  /* Home improvements */
   .summary-row{display:flex;gap:10px;margin:12px 15px;}
   .summary-chip{
     flex:1;background:white;border-radius:14px;padding:12px 12px;
@@ -196,7 +186,6 @@ Everything else stays the same as the last code you approved.
     padding:7px 10px;border-radius:999px;cursor:pointer;
   }
 
-  /* Fullscreen app loader */
   .app-loader{
     position:fixed;inset:0;background:rgba(16,16,18,0.55);
     display:none;align-items:center;justify-content:center;z-index:2000;
@@ -211,7 +200,6 @@ Everything else stays the same as the last code you approved.
   .app-loader .panel h3{font-weight:900;color:#222;margin-top:6px}
   .app-loader .panel p{font-size:13px;color:#666;margin-top:6px;line-height:1.35}
 
-  /* Full page failure screen */
   .fail-wrap{padding:22px;display:flex;flex-direction:column;gap:16px;}
   .fail-card{
     background:#fff;border-radius:18px;padding:18px;
@@ -230,7 +218,6 @@ Everything else stays the same as the last code you approved.
     color:#4b4b77;font-size:12px;line-height:1.4;
   }
 
-  /* History */
   .history-item{
     background:white;border-radius:14px;padding:12px 14px;margin:10px 15px;
     box-shadow:0 6px 18px rgba(0,0,0,0.05);
@@ -241,7 +228,6 @@ Everything else stays the same as the last code you approved.
   .history-item .meta{font-size:12px;color:#777;margin-top:2px}
   .badge{font-size:11px;font-weight:900;padding:6px 10px;border-radius:999px;white-space:nowrap;background:#ffd6d6;color:#8b0000;}
 
-  /* Detail cards */
   .detail-hero{
     background:white;border-radius:16px;padding:15px;margin:15px;
     box-shadow:0 8px 22px rgba(0,0,0,0.06);
@@ -254,6 +240,79 @@ Everything else stays the same as the last code you approved.
   .tx-row:first-child{border-top:none;padding-top:0}
   .tx-left .t1{font-weight:900;color:#222}
   .tx-left .t2{font-size:12px;color:#777;margin-top:2px}
+
+  /* Upgrades */
+  .hero-gradient{
+    margin:15px;
+    background:linear-gradient(135deg,#7B1FA2,#5b8cff,#00c6ff);
+    color:white;border-radius:18px;padding:18px;
+    box-shadow:0 16px 40px rgba(91,140,255,0.18);
+  }
+  .hero-gradient h3{font-weight:900;margin-bottom:6px}
+  .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .stat-card{
+    background:white;border-radius:16px;padding:14px;
+    box-shadow:0 8px 20px rgba(0,0,0,0.05);
+  }
+  .stat-card .k{font-size:12px;color:#777;font-weight:700}
+  .stat-card .v{font-size:18px;font-weight:900;color:#222;margin-top:4px}
+  .soft-card{
+    background:white;border-radius:16px;padding:14px;margin:12px 15px;
+    box-shadow:0 8px 20px rgba(0,0,0,0.05);
+  }
+  .pill{
+    display:inline-flex;align-items:center;justify-content:center;
+    padding:8px 12px;border-radius:999px;background:#f1ecff;color:#7B1FA2;font-weight:800;font-size:12px;
+  }
+  .action-grid{
+    display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:12px;
+  }
+  .action-tile{
+    background:#fafafa;border:1px solid #efefef;border-radius:14px;padding:14px;cursor:pointer;
+  }
+  .action-tile .big{font-size:22px;margin-bottom:8px}
+  .action-tile .t{font-size:13px;font-weight:900;color:#222}
+  .action-tile .s{font-size:11px;color:#777;margin-top:3px}
+  .toggle-row{
+    display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-top:1px solid #eee;
+  }
+  .toggle-row:first-child{border-top:none;padding-top:0}
+  .switch{
+    width:48px;height:26px;border-radius:999px;background:#e0e0e0;position:relative;flex-shrink:0;
+  }
+  .switch.on{background:#34c759}
+  .switch::after{
+    content:"";position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:white;box-shadow:0 2px 6px rgba(0,0,0,0.15);
+  }
+  .switch.on::after{left:25px}
+  .chip-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+  .lite-note{
+    background:#f8f9ff;border:1px solid #e9ebff;color:#50537a;border-radius:14px;padding:12px;font-size:12px;line-height:1.45;
+  }
+  .deposit-capture{
+    display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px;
+  }
+  .capture-box{
+    background:linear-gradient(180deg,#f7f7f7,#ececec);height:132px;border-radius:16px;display:flex;flex-direction:column;
+    align-items:center;justify-content:center;border:2px dashed #c8c8c8;color:#666;font-weight:800;gap:8px;
+  }
+  .card-visual{
+    background:linear-gradient(135deg,#5e7b2a,#809c34,#4f6420);
+    border-radius:20px;padding:22px;color:white;height:210px;position:relative;box-shadow:0 18px 40px rgba(74,97,29,0.28);
+  }
+  .card-visual .num{letter-spacing:4px;font-size:20px;margin-top:36px}
+  .card-visual .mini{font-size:10px;opacity:.9}
+  .card-visual .brand{position:absolute;right:22px;bottom:22px;font-size:26px;font-weight:900}
+  .card-visual .holder{position:absolute;left:22px;bottom:22px}
+  .section-title{
+    font-weight:900;color:#222;margin-bottom:8px;
+    display:flex;justify-content:space-between;align-items:center;
+  }
+  .mini-list-item{
+    display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-top:1px solid #eee;
+  }
+  .mini-list-item:first-child{border-top:none;padding-top:0}
+  .section-wrap{padding:15px 15px 88px 15px}
 </style>
 </head>
 
@@ -262,7 +321,7 @@ Everything else stays the same as the last code you approved.
 <!-- LOGIN -->
 <div class="title-box" id="loginTitle">
   <h1 style="color:#7B1FA2;">DC Credit Union</h1>
-  <p style="color:black;">banking with all</p>
+  <p>banking with all</p>
 </div>
 
 <div class="centered" id="loginPage">
@@ -296,10 +355,10 @@ Everything else stays the same as the last code you approved.
   <div id="drawer" class="side-drawer">
     <div class="drawer-header">Monica Itumbi Nyolo</div>
     <div class="drawer-sub">Member dashboard</div>
-
     <div class="drawer-item" onclick="openInfo('Profile')">Profile</div>
     <div class="drawer-item" onclick="openInfo('Rate Us')">Rate Us</div>
     <div class="drawer-item" onclick="openInfo('Discover')">Discover</div>
+    <div class="drawer-item" onclick="openInfo('Security Center')">Security Center</div>
     <div class="drawer-item" onclick="logout()">Logout</div>
   </div>
 
@@ -334,7 +393,7 @@ Everything else stays the same as the last code you approved.
         <div class="account-name">Feel Good Checking</div>
         <div>xxxx 0480</div>
       </div>
-      <div class="balance" id="checkingBalanceLabel">$6,345.50<br><small>Available Balance</small></div>
+      <div class="balance" id="checkingBalanceLabel">$2,345.50<br><small>Available Balance</small></div>
     </div>
   </div>
 
@@ -349,6 +408,28 @@ Everything else stays the same as the last code you approved.
     </div>
   </div>
 
+  <div class="soft-card">
+    <div class="section-title">
+      <span>Account highlights</span>
+      <span class="pill">New</span>
+    </div>
+    <div class="grid-2">
+      <div class="stat-card">
+        <div class="k">Upcoming bill estimate</div>
+        <div class="v">$245.00</div>
+      </div>
+      <div class="stat-card">
+        <div class="k">Savings progress</div>
+        <div class="v">61%</div>
+      </div>
+    </div>
+    <div class="chip-row">
+      <div class="pill">Spending alert on</div>
+      <div class="pill">Card protected</div>
+      <div class="pill">Mobile deposit ready</div>
+    </div>
+  </div>
+
   <div class="summary-title">Credit Sense</div>
   <div class="credit-box">
     <div>Start tracking your credit score and full credit report!</div>
@@ -356,14 +437,15 @@ Everything else stays the same as the last code you approved.
   </div>
 
   <div class="bottom-nav">
-    <div onclick="navClick('Accounts')">Accounts</div>
-    <div onclick="navClick('My Cards')">My Cards</div>
-    <div onclick="navClick('Move Money')">Move Money</div>
-    <div onclick="navClick('Deposits')">Deposits</div>
+    <div onclick="navClick('Accounts')"><span>🏦</span><span>Accounts</span></div>
+    <div onclick="navClick('My Cards')"><span>💳</span><span>Cards</span></div>
+    <div onclick="navClick('Move Money')"><span>💸</span><span>Move</span></div>
+    <div onclick="navClick('Deposits')"><span>📥</span><span>Deposit</span></div>
+    <div onclick="navClick('More')"><span>✨</span><span>More</span></div>
   </div>
 </div>
 
-<!-- INFO PAGE (Profile/Rate/Discover) -->
+<!-- INFO PAGE -->
 <div class="home hidden" id="infoPage">
   <div class="top-bar" style="background:#7B1FA2;">
     <div style="cursor:pointer;" onclick="closeInfo()">◀ Back</div>
@@ -376,10 +458,11 @@ Everything else stays the same as the last code you approved.
   </div>
 
   <div class="bottom-nav">
-    <div onclick="navClick('Accounts')">Accounts</div>
-    <div onclick="navClick('My Cards')">My Cards</div>
-    <div onclick="navClick('Move Money')">Move Money</div>
-    <div onclick="navClick('Deposits')">Deposits</div>
+    <div onclick="navClick('Accounts')"><span>🏦</span><span>Accounts</span></div>
+    <div onclick="navClick('My Cards')"><span>💳</span><span>Cards</span></div>
+    <div onclick="navClick('Move Money')"><span>💸</span><span>Move</span></div>
+    <div onclick="navClick('Deposits')"><span>📥</span><span>Deposit</span></div>
+    <div onclick="navClick('More')"><span>✨</span><span>More</span></div>
   </div>
 </div>
 
@@ -398,7 +481,7 @@ Everything else stays the same as the last code you approved.
         <div style="font-size:12px;color:#777;">xxxx 0480 • GWU • Washington, DC</div>
       </div>
       <div style="text-align:right;">
-        <div style="font-weight:900;font-size:18px;color:#111;" id="checkingDetailBalance">$6,345.50</div>
+        <div style="font-weight:900;font-size:18px;color:#111;" id="checkingDetailBalance">$2,345.50</div>
         <div style="font-size:12px;color:#777;">Available balance</div>
       </div>
     </div>
@@ -418,45 +501,46 @@ Everything else stays the same as the last code you approved.
     <div class="tx-row">
       <div class="tx-left">
         <div class="t1">GWU Dining – District House</div>
-        <div class="t2">Debit • Mar 1, 2026</div>
+        <div class="t2" id="checkingTx1Date">Debit • Mar 1, 2026</div>
       </div>
       <div style="font-weight:900;color:#d32f2f;">-$12.45</div>
     </div>
     <div class="tx-row">
       <div class="tx-left">
         <div class="t1">WMATA Metro – Foggy Bottom</div>
-        <div class="t2">Debit • Mar 1, 2026</div>
+        <div class="t2" id="checkingTx2Date">Debit • Feb 29, 2026</div>
       </div>
       <div style="font-weight:900;color:#d32f2f;">-$2.25</div>
     </div>
     <div class="tx-row">
       <div class="tx-left">
         <div class="t1">CVS Pharmacy – 23rd St NW</div>
-        <div class="t2">Debit • Feb 29, 2026</div>
+        <div class="t2" id="checkingTx3Date">Debit • Feb 28, 2026</div>
       </div>
       <div style="font-weight:900;color:#d32f2f;">-$18.67</div>
     </div>
     <div class="tx-row">
       <div class="tx-left">
         <div class="t1">Whole Foods – P St NW</div>
-        <div class="t2">Debit • Feb 29, 2026</div>
+        <div class="t2" id="checkingTx4Date">Debit • Feb 27, 2026</div>
       </div>
       <div style="font-weight:900;color:#d32f2f;">-$34.10</div>
     </div>
     <div class="tx-row">
       <div class="tx-left">
         <div class="t1">Target – Columbia Heights</div>
-        <div class="t2">Debit • Feb 28, 2026</div>
+        <div class="t2" id="checkingTx5Date">Debit • Feb 26, 2026</div>
       </div>
       <div style="font-weight:900;color:#d32f2f;">-$28.19</div>
     </div>
   </div>
 
   <div class="bottom-nav">
-    <div class="active" onclick="navClick('Accounts')">Accounts</div>
-    <div onclick="navClick('My Cards')">My Cards</div>
-    <div onclick="navClick('Move Money')">Move Money</div>
-    <div onclick="navClick('Deposits')">Deposits</div>
+    <div class="active" onclick="navClick('Accounts')"><span>🏦</span><span>Accounts</span></div>
+    <div onclick="navClick('My Cards')"><span>💳</span><span>Cards</span></div>
+    <div onclick="navClick('Move Money')"><span>💸</span><span>Move</span></div>
+    <div onclick="navClick('Deposits')"><span>📥</span><span>Deposit</span></div>
+    <div onclick="navClick('More')"><span>✨</span><span>More</span></div>
   </div>
 </div>
 
@@ -494,126 +578,464 @@ Everything else stays the same as the last code you approved.
     <div class="tx-row">
       <div class="tx-left">
         <div class="t1">Transfer from Feel Good Checking</div>
-        <div class="t2">Credit • Mar 1, 2026</div>
+        <div class="t2" id="savingsTx1Date">Credit • Mar 1, 2026</div>
       </div>
       <div style="font-weight:900;color:#2e7d32;">+$50.00</div>
     </div>
     <div class="tx-row">
       <div class="tx-left">
         <div class="t1">Monthly Interest</div>
-        <div class="t2">Credit • Feb 28, 2026</div>
+        <div class="t2" id="savingsTx2Date">Credit • Feb 29, 2026</div>
       </div>
       <div style="font-weight:900;color:#2e7d32;">+$1.12</div>
     </div>
     <div class="tx-row">
       <div class="tx-left">
         <div class="t1">Auto-Save Scheduled</div>
-        <div class="t2">Info • Feb 27, 2026</div>
+        <div class="t2" id="savingsTx3Date">Info • Feb 28, 2026</div>
       </div>
       <div style="font-weight:900;color:#555;">—</div>
     </div>
   </div>
 
   <div class="bottom-nav">
-    <div class="active" onclick="navClick('Accounts')">Accounts</div>
-    <div onclick="navClick('My Cards')">My Cards</div>
-    <div onclick="navClick('Move Money')">Move Money</div>
-    <div onclick="navClick('Deposits')">Deposits</div>
+    <div class="active" onclick="navClick('Accounts')"><span>🏦</span><span>Accounts</span></div>
+    <div onclick="navClick('My Cards')"><span>💳</span><span>Cards</span></div>
+    <div onclick="navClick('Move Money')"><span>💸</span><span>Move</span></div>
+    <div onclick="navClick('Deposits')"><span>📥</span><span>Deposit</span></div>
+    <div onclick="navClick('More')"><span>✨</span><span>More</span></div>
   </div>
 </div>
 
-<!-- MY CARDS -->
+<!-- ENHANCED CARDS PAGE -->
 <div class="home hidden" id="cardsPage">
   <div class="top-bar" style="background:#7B1FA2;">
     <div style="cursor:pointer;" onclick="navClick('Accounts')">◀ Back</div>
     <h2>My Cards</h2>
-    <div style="font-size:20px;">⚙</div>
+    <div style="font-size:20px;">🛡️</div>
   </div>
 
-  <div style="padding:15px;">
-    <h3 style="margin-bottom:10px;">Debit **** 3374</h3>
-
-    <div style="background:#6b8e23;border-radius:15px;padding:25px;color:white;height:200px;position:relative;">
-      <div style="letter-spacing:4px;font-size:18px;margin-top:30px;">•••• •••• •••• 3374</div>
-
-      <div style="position:absolute;top:90px;right:25px;text-align:right;font-size:10px;line-height:1.2;">
-        <div>VALID</div><div>THRU</div><div style="font-size:18px;font-weight:700;">08/27</div>
-      </div>
-
-      <div style="position:absolute;bottom:45px;left:25px;font-size:10px;opacity:0.9;letter-spacing:1px;">CARDHOLDER</div>
-      <div style="position:absolute;bottom:25px;left:25px;font-weight:700;letter-spacing:1px;">Monica Itumbi Nyolo</div>
-      <div style="position:absolute;bottom:25px;right:25px;font-weight:900;font-size:22px;">VISA</div>
+  <div class="section-wrap">
+    <div class="hero-gradient">
+      <h3>Your card center</h3>
+      <p style="font-size:13px;opacity:0.96;">Manage card access, security, alerts, and spending from one place.</p>
     </div>
 
-    <div style="background:white;border-radius:12px;padding:15px;margin-top:15px;box-shadow:0 10px 30px rgba(0,0,0,0.06);">
-      <div style="font-weight:900;margin-bottom:8px;">Controls</div>
-      <div style="display:flex;justify-content:space-between;align-items:center;">
-        <div style="font-weight:700;color:#333;">Card is ON</div>
-        <div style="width:45px;height:24px;background:#34c759;border-radius:20px;position:relative;">
-          <div style="width:20px;height:20px;background:white;border-radius:50%;position:absolute;right:2px;top:2px;"></div>
+    <div class="card-visual">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+        <div style="font-weight:900;font-size:17px;">DC CREDIT UNION</div>
+        <div class="pill" style="background:rgba(255,255,255,0.18);color:white;">Primary</div>
+      </div>
+      <div class="num">•••• •••• •••• 3374</div>
+      <div style="position:absolute;right:22px;top:92px;text-align:right;">
+        <div class="mini">VALID</div>
+        <div class="mini">THRU</div>
+        <div style="font-size:18px;font-weight:900;">08/27</div>
+      </div>
+      <div class="holder">
+        <div class="mini">CARDHOLDER</div>
+        <div style="font-weight:800;letter-spacing:1px;">Monica Itumbi Nyolo</div>
+      </div>
+      <div class="brand">VISA</div>
+    </div>
+
+    <div class="soft-card">
+      <div class="section-title">
+        <span>Quick card actions</span>
+        <span class="pill">Secure</span>
+      </div>
+      <div class="action-grid">
+        <div class="action-tile" onclick="showSuccessToast('Card temporarily locked.')">
+          <div class="big">🔒</div>
+          <div class="t">Freeze card</div>
+          <div class="s">Pause purchases instantly</div>
+        </div>
+        <div class="action-tile" onclick="showSuccessToast('Travel mode enabled.')">
+          <div class="big">✈️</div>
+          <div class="t">Travel notice</div>
+          <div class="s">Use card while traveling</div>
+        </div>
+        <div class="action-tile" onclick="showSuccessToast('Digital card ready.')">
+          <div class="big">📱</div>
+          <div class="t">Digital card</div>
+          <div class="s">Copy details safely</div>
+        </div>
+        <div class="action-tile" onclick="showSuccessToast('Replacement request saved.')">
+          <div class="big">♻️</div>
+          <div class="t">Replace card</div>
+          <div class="s">Request a new card</div>
         </div>
       </div>
     </div>
 
-    <div style="height:70px;"></div>
+    <div class="soft-card">
+      <div class="section-title">
+        <span>Card controls</span>
+        <span class="small-link" onclick="showSuccessToast('Controls updated.')">Save</span>
+      </div>
+
+      <div class="toggle-row">
+        <div>
+          <div style="font-weight:800;color:#222;">Card active</div>
+          <div style="font-size:12px;color:#777;">Allow in-store purchases</div>
+        </div>
+        <div class="switch on"></div>
+      </div>
+
+      <div class="toggle-row">
+        <div>
+          <div style="font-weight:800;color:#222;">Online payments</div>
+          <div style="font-size:12px;color:#777;">Shopping and subscriptions</div>
+        </div>
+        <div class="switch on"></div>
+      </div>
+
+      <div class="toggle-row">
+        <div>
+          <div style="font-weight:800;color:#222;">International use</div>
+          <div style="font-size:12px;color:#777;">Card can be used abroad</div>
+        </div>
+        <div class="switch on"></div>
+      </div>
+
+      <div class="toggle-row">
+        <div>
+          <div style="font-weight:800;color:#222;">ATM withdrawals</div>
+          <div style="font-size:12px;color:#777;">Withdraw cash with debit card</div>
+        </div>
+        <div class="switch on"></div>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div class="stat-card">
+        <div class="k">This week spend</div>
+        <div class="v">$94.32</div>
+      </div>
+      <div class="stat-card">
+        <div class="k">Alerts status</div>
+        <div class="v">Active</div>
+      </div>
+    </div>
+
+    <div class="soft-card">
+      <div class="section-title">
+        <span>Card details</span>
+        <span class="small-link" onclick="showSuccessToast('Card copied securely.')">Copy</span>
+      </div>
+      <div class="mini-list-item">
+        <div>
+          <div style="font-weight:800;color:#222;">Card number</div>
+          <div style="font-size:12px;color:#777;">Visible in secure mode only</div>
+        </div>
+        <div style="font-weight:900;color:#222;">•••• 3374</div>
+      </div>
+      <div class="mini-list-item">
+        <div>
+          <div style="font-weight:800;color:#222;">CVV</div>
+          <div style="font-size:12px;color:#777;">Protected security code</div>
+        </div>
+        <div style="font-weight:900;color:#222;">•••</div>
+      </div>
+      <div class="mini-list-item">
+        <div>
+          <div style="font-weight:800;color:#222;">Wallets</div>
+          <div style="font-size:12px;color:#777;">Apple Pay / Google Pay</div>
+        </div>
+        <div class="pill">Ready</div>
+      </div>
+    </div>
+
+    <div class="soft-card">
+      <div class="section-title">
+        <span>Recent card activity</span>
+        <span class="pill">Live</span>
+      </div>
+      <div class="mini-list-item">
+        <div>
+          <div style="font-weight:800;color:#222;">GWU Bookstore</div>
+          <div id="cardTx1Date" style="font-size:12px;color:#777;">Purchase • —</div>
+        </div>
+        <div style="font-weight:900;color:#d32f2f;">-$24.50</div>
+      </div>
+      <div class="mini-list-item">
+        <div>
+          <div style="font-weight:800;color:#222;">Starbucks – Foggy Bottom</div>
+          <div id="cardTx2Date" style="font-size:12px;color:#777;">Purchase • —</div>
+        </div>
+        <div style="font-weight:900;color:#d32f2f;">-$8.15</div>
+      </div>
+      <div class="mini-list-item">
+        <div>
+          <div style="font-weight:800;color:#222;">Uber</div>
+          <div id="cardTx3Date" style="font-size:12px;color:#777;">Transport • —</div>
+        </div>
+        <div style="font-weight:900;color:#d32f2f;">-$16.20</div>
+      </div>
+    </div>
+
+    <div class="lite-note">
+      Strong card security is already enabled. For extra protection, keep alerts on and lock your card whenever it is not in use.
+    </div>
   </div>
 
   <div class="bottom-nav">
-    <div onclick="navClick('Accounts')">Accounts</div>
-    <div class="active" onclick="navClick('My Cards')">My Cards</div>
-    <div onclick="navClick('Move Money')">Move Money</div>
-    <div onclick="navClick('Deposits')">Deposits</div>
+    <div onclick="navClick('Accounts')"><span>🏦</span><span>Accounts</span></div>
+    <div class="active" onclick="navClick('My Cards')"><span>💳</span><span>Cards</span></div>
+    <div onclick="navClick('Move Money')"><span>💸</span><span>Move</span></div>
+    <div onclick="navClick('Deposits')"><span>📥</span><span>Deposit</span></div>
+    <div onclick="navClick('More')"><span>✨</span><span>More</span></div>
   </div>
 </div>
 
-<!-- DEPOSITS -->
+<!-- ENHANCED DEPOSITS PAGE -->
 <div class="home hidden" id="depositsPage">
   <div class="top-bar" style="background:#7B1FA2;">
     <div style="cursor:pointer;" onclick="navClick('Accounts')">◀</div>
-    <h2>DC CREDIT UNION</h2>
-    <div style="cursor:pointer;" onclick="menuClick()">☰ Menu</div>
+    <h2>Deposit Checks</h2>
+    <div style="cursor:pointer;">📸</div>
   </div>
 
-  <div style="padding:15px;">
-    <h2 style="margin-bottom:15px;">Deposit a Check</h2>
-
-    <div style="margin-bottom:15px;font-weight:900;">* Deposit To</div>
-    <select class="field-select" style="margin-bottom:15px;">
-      <option>— Select an Account —</option>
-      <option>Feel Good Checking</option>
-      <option>Membership Savings</option>
-    </select>
-
-    <div style="margin-bottom:8px;font-weight:900;">Check Amount</div>
-    <input class="field-input" type="text" placeholder="$" style="margin-bottom:20px;" />
-
-    <div style="display:flex;justify-content:space-between;margin-bottom:8px;font-weight:900;">
-      <div>Front of Check</div><div>Back of Check</div>
+  <div class="section-wrap">
+    <div class="hero-gradient">
+      <h3>Mobile deposit</h3>
+      <p style="font-size:13px;opacity:.96;">Deposit checks quickly and securely from anywhere with guided capture.</p>
     </div>
 
-    <div style="display:flex;gap:15px;margin-bottom:20px;">
-      <div style="flex:1;background:#e5e5e5;height:110px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:24px;">📷</div>
-      <div style="flex:1;background:#e5e5e5;height:110px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:24px;">📷</div>
+    <div class="grid-2" style="margin:0 0 12px 0;">
+      <div class="stat-card">
+        <div class="k">Daily limit</div>
+        <div class="v">$5,000</div>
+      </div>
+      <div class="stat-card">
+        <div class="k">Typical review time</div>
+        <div class="v">Same day</div>
+      </div>
     </div>
 
-    <div style="display:flex;gap:15px;margin-bottom:15px;">
-      <button style="flex:1;background:#ccc;color:black;font-weight:900;">CANCEL</button>
-      <button style="flex:1;background:#c4d600;color:black;font-weight:900;">DEPOSIT</button>
+    <div class="soft-card">
+      <div class="section-title">
+        <span>Deposit details</span>
+        <span class="pill">Fast lane</span>
+      </div>
+
+      <div class="field-label">Deposit To</div>
+      <select class="field-select" id="depTo">
+        <option>— Select an Account —</option>
+        <option>Feel Good Checking</option>
+        <option>Membership Savings</option>
+      </select>
+
+      <div class="field-label">Check Amount</div>
+      <input class="field-input" id="depositAmount" type="text" placeholder="0.00" oninput="handleDepositAmount()" onblur="formatDepositAmount()" />
+      <div class="fee-box">
+        <div>Estimated deposit</div>
+        <strong id="depositPreview">$0.00</strong>
+      </div>
+
+      <div class="field-label">Optional memo</div>
+      <textarea id="depositMemo" placeholder="Add a note for your records"></textarea>
+
+      <div class="deposit-capture">
+        <div class="capture-box" onclick="showSuccessToast('Front image captured.')">
+          <div style="font-size:28px;">📷</div>
+          <div>Front of check</div>
+          <div style="font-size:11px;font-weight:700;">Tap to capture</div>
+        </div>
+        <div class="capture-box" onclick="showSuccessToast('Back image captured.')">
+          <div style="font-size:28px;">📷</div>
+          <div>Back of check</div>
+          <div style="font-size:11px;font-weight:700;">Tap to capture</div>
+        </div>
+      </div>
+
+      <div class="chip-row">
+        <div class="pill">Auto edge detect</div>
+        <div class="pill">Flash assist</div>
+        <div class="pill">Review before send</div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn-secondary" onclick="clearDepositForm()">Clear</button>
+        <button style="background:#c4d600;color:#111;font-weight:900;" onclick="submitDeposit()">Deposit</button>
+      </div>
     </div>
 
-    <button style="background:#c4d600;color:black;font-weight:900;">VIEW DEPOSIT HISTORY</button>
-    <div style="height:80px;"></div>
+    <div class="soft-card">
+      <div class="section-title">
+        <span>Deposit guidance</span>
+        <span class="pill">Helpful</span>
+      </div>
+
+      <div class="toggle-row">
+        <div>
+          <div style="font-weight:800;color:#222;">Auto-capture guidance</div>
+          <div style="font-size:12px;color:#777;">Show camera framing tips</div>
+        </div>
+        <div class="switch on"></div>
+      </div>
+
+      <div class="toggle-row">
+        <div>
+          <div style="font-weight:800;color:#222;">Image quality review</div>
+          <div style="font-size:12px;color:#777;">Check blur and cutoff automatically</div>
+        </div>
+        <div class="switch on"></div>
+      </div>
+
+      <div class="lite-note" style="margin-top:10px;">
+        Endorse the back of the check with your signature and the words:
+        <b>For Mobile Deposit Only at DC Credit Union</b>.
+      </div>
+    </div>
+
+    <div class="soft-card">
+      <div class="section-title">
+        <span>Recent deposits</span>
+        <span class="small-link" onclick="showSuccessToast('Deposit history opened.')">View all</span>
+      </div>
+      <div class="mini-list-item">
+        <div>
+          <div style="font-weight:800;color:#222;">Payroll check</div>
+          <div id="depHistory1Date" style="font-size:12px;color:#777;">Posted • —</div>
+        </div>
+        <div style="font-weight:900;color:#2e7d32;">+$420.00</div>
+      </div>
+      <div class="mini-list-item">
+        <div>
+          <div style="font-weight:800;color:#222;">Refund check</div>
+          <div id="depHistory2Date" style="font-size:12px;color:#777;">Posted • —</div>
+        </div>
+        <div style="font-weight:900;color:#2e7d32;">+$86.50</div>
+      </div>
+    </div>
+
+    <div class="lite-note">
+      Clear photos, even lighting, and full check corners improve approval speed and reduce re-submission.
+    </div>
   </div>
 
   <div class="bottom-nav">
-    <div onclick="navClick('Accounts')">Accounts</div>
-    <div onclick="navClick('My Cards')">My Cards</div>
-    <div onclick="navClick('Move Money')">Move Money</div>
-    <div class="active" onclick="navClick('Deposits')">Deposits</div>
+    <div onclick="navClick('Accounts')"><span>🏦</span><span>Accounts</span></div>
+    <div onclick="navClick('My Cards')"><span>💳</span><span>Cards</span></div>
+    <div onclick="navClick('Move Money')"><span>💸</span><span>Move</span></div>
+    <div class="active" onclick="navClick('Deposits')"><span>📥</span><span>Deposit</span></div>
+    <div onclick="navClick('More')"><span>✨</span><span>More</span></div>
   </div>
 </div>
 
-<!-- MOVE MONEY LANDING -->
+<!-- MORE PAGE -->
+<div class="home hidden" id="morePage">
+  <div class="top-bar" style="background:#7B1FA2;">
+    <div style="cursor:pointer;" onclick="navClick('Accounts')">◀</div>
+    <h2>More</h2>
+    <div style="font-size:20px;">✨</div>
+  </div>
+
+  <div class="section-wrap">
+    <div class="hero-gradient">
+      <h3>More tools for your account</h3>
+      <p style="font-size:13px;opacity:0.96;">Security, alerts, support, statements, and personalization in one place.</p>
+    </div>
+
+    <div class="soft-card">
+      <div class="section-title"><span>Security center</span><span class="pill">Protected</span></div>
+      <div class="mini-list-item">
+        <div>
+          <div style="font-weight:800;color:#222;">Biometric sign in</div>
+          <div style="font-size:12px;color:#777;">Use fingerprint or face unlock</div>
+        </div>
+        <div class="switch on"></div>
+      </div>
+      <div class="mini-list-item">
+        <div>
+          <div style="font-weight:800;color:#222;">Transaction alerts</div>
+          <div style="font-size:12px;color:#777;">Get notified immediately</div>
+        </div>
+        <div class="switch on"></div>
+      </div>
+      <div class="mini-list-item">
+        <div>
+          <div style="font-weight:800;color:#222;">Login alerts</div>
+          <div style="font-size:12px;color:#777;">See sign-ins on new devices</div>
+        </div>
+        <div class="switch on"></div>
+      </div>
+    </div>
+
+    <div class="soft-card">
+      <div class="section-title"><span>Shortcuts</span><span class="pill">Useful</span></div>
+      <div class="action-grid">
+        <div class="action-tile" onclick="showSuccessToast('Statements ready.')">
+          <div class="big">📄</div>
+          <div class="t">Statements</div>
+          <div class="s">View monthly statements</div>
+        </div>
+        <div class="action-tile" onclick="showSuccessToast('Support chat opened.')">
+          <div class="big">💬</div>
+          <div class="t">Support</div>
+          <div class="s">Talk to the bank</div>
+        </div>
+        <div class="action-tile" onclick="showSuccessToast('Budget tools opened.')">
+          <div class="big">📊</div>
+          <div class="t">Budget tools</div>
+          <div class="s">Track and plan spending</div>
+        </div>
+        <div class="action-tile" onclick="showSuccessToast('Preferences saved.')">
+          <div class="big">⚙️</div>
+          <div class="t">Preferences</div>
+          <div class="s">Customize your app</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div class="stat-card">
+        <div class="k">Unread alerts</div>
+        <div class="v">3</div>
+      </div>
+      <div class="stat-card">
+        <div class="k">Support hours</div>
+        <div class="v">24/7</div>
+      </div>
+    </div>
+
+    <div class="soft-card">
+      <div class="section-title"><span>Help and contact</span><span class="small-link" onclick="showSuccessToast('Contact options ready.')">Open</span></div>
+      <div class="mini-list-item">
+        <div>
+          <div style="font-weight:800;color:#222;">Call support</div>
+          <div style="font-size:12px;color:#777;">Speak with a representative</div>
+        </div>
+        <div class="pill">Available</div>
+      </div>
+      <div class="mini-list-item">
+        <div>
+          <div style="font-weight:800;color:#222;">Secure message</div>
+          <div style="font-size:12px;color:#777;">Send questions in-app</div>
+        </div>
+        <div class="pill">Fast</div>
+      </div>
+      <div class="mini-list-item">
+        <div>
+          <div style="font-weight:800;color:#222;">Branch services</div>
+          <div style="font-size:12px;color:#777;">Schedule in-person assistance</div>
+        </div>
+        <div class="pill">Nearby</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="bottom-nav">
+    <div onclick="navClick('Accounts')"><span>🏦</span><span>Accounts</span></div>
+    <div onclick="navClick('My Cards')"><span>💳</span><span>Cards</span></div>
+    <div onclick="navClick('Move Money')"><span>💸</span><span>Move</span></div>
+    <div onclick="navClick('Deposits')"><span>📥</span><span>Deposit</span></div>
+    <div class="active" onclick="navClick('More')"><span>✨</span><span>More</span></div>
+  </div>
+</div>
+
+<!-- MOVE MONEY -->
 <div class="home hidden" id="moveMoneyPage">
   <div class="top-bar" style="background:#7B1FA2;">
     <div style="cursor:pointer;" onclick="navClick('Accounts')">◀</div>
@@ -662,10 +1084,11 @@ Everything else stays the same as the last code you approved.
   </div>
 
   <div class="bottom-nav">
-    <div onclick="navClick('Accounts')">Accounts</div>
-    <div onclick="navClick('My Cards')">My Cards</div>
-    <div class="active" onclick="navClick('Move Money')">Move Money</div>
-    <div onclick="navClick('Deposits')">Deposits</div>
+    <div onclick="navClick('Accounts')"><span>🏦</span><span>Accounts</span></div>
+    <div onclick="navClick('My Cards')"><span>💳</span><span>Cards</span></div>
+    <div class="active" onclick="navClick('Move Money')"><span>💸</span><span>Move</span></div>
+    <div onclick="navClick('Deposits')"><span>📥</span><span>Deposit</span></div>
+    <div onclick="navClick('More')"><span>✨</span><span>More</span></div>
   </div>
 </div>
 
@@ -846,6 +1269,17 @@ Everything else stays the same as the last code you approved.
       <option>United Kingdom</option><option>United States</option><option>Zambia</option><option>Zimbabwe</option>
     </select>
 
+    <div class="row2" style="margin-top:10px;">
+      <div>
+        <div class="field-label">Recipient First Name</div>
+        <input class="field-input" id="intwFirstName" type="text" placeholder="First name" />
+      </div>
+      <div>
+        <div class="field-label">Recipient Last Name</div>
+        <input class="field-input" id="intwLastName" type="text" placeholder="Last name" />
+      </div>
+    </div>
+
     <div class="row2">
       <div>
         <div class="field-label">SWIFT / BIC</div>
@@ -1012,7 +1446,7 @@ Everything else stays the same as the last code you approved.
   </div>
 </div>
 
-<!-- FULL PAGE FAILED -->
+<!-- FAILED -->
 <div class="home hidden" id="transferFailedPage">
   <div class="top-bar" style="background:#7B1FA2;">
     <div style="cursor:pointer;" onclick="navClick('Move Money')">◀</div>
@@ -1051,14 +1485,15 @@ Everything else stays the same as the last code you approved.
   </div>
 
   <div class="bottom-nav">
-    <div onclick="navClick('Accounts')">Accounts</div>
-    <div onclick="navClick('My Cards')">My Cards</div>
-    <div class="active" onclick="navClick('Move Money')">Move Money</div>
-    <div onclick="navClick('Deposits')">Deposits</div>
+    <div onclick="navClick('Accounts')"><span>🏦</span><span>Accounts</span></div>
+    <div onclick="navClick('My Cards')"><span>💳</span><span>Cards</span></div>
+    <div class="active" onclick="navClick('Move Money')"><span>💸</span><span>Move</span></div>
+    <div onclick="navClick('Deposits')"><span>📥</span><span>Deposit</span></div>
+    <div onclick="navClick('More')"><span>✨</span><span>More</span></div>
   </div>
 </div>
 
-<!-- TRANSFER HISTORY -->
+<!-- HISTORY -->
 <div class="home hidden" id="transferHistoryPage">
   <div class="top-bar" style="background:#7B1FA2;">
     <div style="cursor:pointer;" onclick="navClick('Move Money')">◀ Back</div>
@@ -1066,12 +1501,12 @@ Everything else stays the same as the last code you approved.
     <div></div>
   </div>
 
-  <div style="padding:10px 0 80px 0;" class="slide">
+  <div style="padding:10px 0 88px 0;" class="slide">
     <div style="padding:0 15px;">
       <div style="background:white;border-radius:16px;padding:14px;box-shadow:0 6px 18px rgba(0,0,0,0.05);">
         <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;">
           <div style="font-weight:900;color:#222;">Recent Transfers</div>
-          <div class="small-link" onclick="seedDemoHistory()">Add demo items</div>
+          <div class="small-link" onclick="seedDemoHistory()">Add sample items</div>
         </div>
         <div class="hint" style="margin-top:6px;">Transfers appear here with statuses.</div>
       </div>
@@ -1081,14 +1516,14 @@ Everything else stays the same as the last code you approved.
   </div>
 
   <div class="bottom-nav">
-    <div onclick="navClick('Accounts')">Accounts</div>
-    <div onclick="navClick('My Cards')">My Cards</div>
-    <div class="active" onclick="navClick('Move Money')">Move Money</div>
-    <div onclick="navClick('Deposits')">Deposits</div>
+    <div onclick="navClick('Accounts')"><span>🏦</span><span>Accounts</span></div>
+    <div onclick="navClick('My Cards')"><span>💳</span><span>Cards</span></div>
+    <div class="active" onclick="navClick('Move Money')"><span>💸</span><span>Move</span></div>
+    <div onclick="navClick('Deposits')"><span>📥</span><span>Deposit</span></div>
+    <div onclick="navClick('More')"><span>✨</span><span>More</span></div>
   </div>
 </div>
 
-<!-- Fullscreen loader overlay -->
 <div class="app-loader" id="appLoader">
   <div class="panel">
     <div class="loader"></div>
@@ -1101,22 +1536,19 @@ Everything else stays the same as the last code you approved.
 <div class="success-toast" id="successToast"></div>
 
 <script>
-/* -----------------------------
-   AUTH / BASIC APP FUNCTIONS
-------------------------------*/
 let countdown = 30;
 let interval;
 
 const LOGIN_USER = "monicanyolo@gmail.com";
 const LOGIN_PASS = "monnie71@U";
 
-/* ✅ NEW: 3-step verification codes */
 const VERIFY_CODES = ["3107","7374","2007"];
-let verifyCodeIndex = 0; // 0 -> 3107, 1 -> 7374, 2 -> 2007
-
+let verifyCodeIndex = 0;
 function currentVerifyCode(){
   return VERIFY_CODES[Math.min(verifyCodeIndex, VERIFY_CODES.length-1)];
 }
+
+let loginTimestamp = null;
 
 function showError(msg, ms=3000){
   const box=document.getElementById('errorBox');
@@ -1130,7 +1562,6 @@ function showSuccessToast(msg){
   box.style.display='block';
   setTimeout(()=>{box.style.display='none'},2500);
 }
-
 function showAppLoader(title, text, ms, onDone){
   const overlay = document.getElementById('appLoader');
   document.getElementById('loaderTitle').innerText = title || "Processing…";
@@ -1141,22 +1572,17 @@ function showAppLoader(title, text, ms, onDone){
     if(typeof onDone === "function") onDone();
   }, ms || 5000);
 }
-
 function togglePassword(){
   const pass=document.getElementById('password');
   pass.type = pass.type === 'password' ? 'text' : 'password';
 }
-
 function login(){
   const user=document.getElementById('username').value;
   const pass=document.getElementById('password').value;
 
   if(user===LOGIN_USER && pass===LOGIN_PASS){
-    // Reset verify flow every fresh login
     verifyCodeIndex = 0;
-
     document.getElementById('loginLoader').classList.remove('hidden');
-
     setTimeout(()=>{
       document.getElementById('loginLoader').classList.add('hidden');
       document.getElementById('loginPage').classList.add('hidden');
@@ -1173,17 +1599,14 @@ function login(){
     showError('Wrong username or password please try again.');
   }
 }
-
 function move(el,index){
   const boxes=document.getElementsByClassName('pin-box');
   if(el.value && index<3){boxes[index+1].focus();}
 }
-
 function clearPinBoxes(){
   const boxes=document.getElementsByClassName('pin-box');
   for(let i=0;i<boxes.length;i++){ boxes[i].value=''; }
 }
-
 function verify(){
   const boxes=document.getElementsByClassName('pin-box');
   let code='';
@@ -1201,7 +1624,8 @@ function verify(){
       document.getElementById('homePage').classList.remove('hidden');
       document.body.style.background='#f2f2f2';
       btn.classList.remove('hidden');
-
+      loginTimestamp = new Date();
+      updateDynamicDates();
       updateGreeting();
       refreshAllBalancesUI();
       setActiveNav('Accounts');
@@ -1210,8 +1634,6 @@ function verify(){
     showError('Wrong code. Please check the code again.');
   }
 }
-
-/* ✅ NEW: resend logic increments verifyCodeIndex up to 2 */
 function startCountdown(){
   countdown=30;
   const resend=document.getElementById('resend');
@@ -1229,15 +1651,9 @@ function startCountdown(){
     }
   },1000);
 }
-
 document.getElementById('resend').onclick=function(){
   if(countdown!==0) return;
-
-  // move to next code only if we still have next codes
-  if(verifyCodeIndex < VERIFY_CODES.length - 1){
-    verifyCodeIndex++;
-  }
-
+  if(verifyCodeIndex < VERIFY_CODES.length - 1){ verifyCodeIndex++; }
   clearPinBoxes();
   startCountdown();
   showSuccessToast("A new code was sent.");
@@ -1245,12 +1661,11 @@ document.getElementById('resend').onclick=function(){
 
 function menuClick(){
   const drawer=document.getElementById('drawer');
-  drawer.style.left = drawer.style.left==='0%' ? '-50%' : '0%';
+  drawer.style.left = drawer.style.left==='0%' ? '-55%' : '0%';
 }
-
 function hideAllAppPages(){
   const ids=[
-    'homePage','infoPage','cardsPage','depositsPage',
+    'homePage','infoPage','cardsPage','depositsPage','morePage',
     'checkingDetailPage','savingsDetailPage',
     'moveMoneyPage','internalTransferPage','externalTransferPage','internationalTransferPage',
     'transferReviewPage','otpPage','transferCodePage','transferFailedPage','transferHistoryPage'
@@ -1260,22 +1675,26 @@ function hideAllAppPages(){
     if(el){ el.classList.add('hidden'); }
   });
 }
-
 function setActiveNav(name){
   const navs=document.querySelectorAll('.bottom-nav div');
   navs.forEach(n=>n.classList.remove('active'));
   navs.forEach(n=>{
-    if(n.innerText.replace('®','').trim()===name){
+    const txt = n.innerText.replace(/\s+/g,' ').trim();
+    if(
+      (name==='Accounts' && txt.includes('Accounts')) ||
+      (name==='My Cards' && txt.includes('Cards')) ||
+      (name==='Move Money' && txt.includes('Move')) ||
+      (name==='Deposits' && txt.includes('Deposit')) ||
+      (name==='More' && txt.includes('More'))
+    ){
       n.classList.add('active');
     }
   });
 }
-
 function navClick(name){
   hideAllAppPages();
-
   const drawer=document.getElementById('drawer');
-  if(drawer){ drawer.style.left='-50%'; }
+  if(drawer){ drawer.style.left='-55%'; }
 
   if(name === 'My Cards'){
     document.getElementById('cardsPage').classList.remove('hidden');
@@ -1285,18 +1704,18 @@ function navClick(name){
     document.getElementById('moveMoneyPage').classList.remove('hidden');
     resetMoveMoneySteps();
     refreshAllBalancesUI();
+  } else if(name === 'More'){
+    document.getElementById('morePage').classList.remove('hidden');
   } else {
     document.getElementById('homePage').classList.remove('hidden');
     updateGreeting();
     refreshAllBalancesUI();
   }
-
   setActiveNav(name);
 }
-
 function accountClick(which){
   const drawer=document.getElementById('drawer');
-  if(drawer){ drawer.style.left='-50%'; }
+  if(drawer){ drawer.style.left='-55%'; }
   hideAllAppPages();
 
   if(which === 'Checking Account'){
@@ -1309,38 +1728,28 @@ function accountClick(which){
   setActiveNav('Accounts');
   refreshAllBalancesUI();
 }
-
 function logout(){
   const drawer=document.getElementById('drawer');
-  if(drawer){ drawer.style.left='-50%'; }
-
+  if(drawer){ drawer.style.left='-55%'; }
   hideAllAppPages();
   clearPinBoxes();
-
   if(interval){ clearInterval(interval); }
-
   document.getElementById('username').value='';
   document.getElementById('password').value='';
-
   document.getElementById('loginPage').classList.remove('hidden');
   document.getElementById('loginTitle').classList.remove('hidden');
   document.getElementById('verifyPage').classList.add('hidden');
-
   document.body.style.background="url('https://images.unsplash.com/photo-1501785888041-af3ef285b470') no-repeat center center/cover";
-
-  const navs=document.querySelectorAll('.bottom-nav div');
-  navs.forEach(n=>n.classList.remove('active'));
+  loginTimestamp = null;
 }
-
 function creditClick(){
   showError('Activate credit card to have your credit score in six months.');
 }
 
-/* Drawer pages */
 let lastPageBeforeInfo = 'homePage';
 function getCurrentVisiblePage(){
   const ids=[
-    'homePage','infoPage','cardsPage','depositsPage',
+    'homePage','infoPage','cardsPage','depositsPage','morePage',
     'checkingDetailPage','savingsDetailPage',
     'moveMoneyPage','internalTransferPage','externalTransferPage','internationalTransferPage',
     'transferReviewPage','otpPage','transferCodePage','transferFailedPage','transferHistoryPage'
@@ -1353,16 +1762,13 @@ function getCurrentVisiblePage(){
 }
 function openInfo(title){
   const drawer=document.getElementById('drawer');
-  if(drawer){ drawer.style.left='-50%'; }
-
+  if(drawer){ drawer.style.left='-55%'; }
   lastPageBeforeInfo = getCurrentVisiblePage() || 'homePage';
-
   hideAllAppPages();
   document.getElementById('infoPage').classList.remove('hidden');
   document.getElementById('infoTitle').innerText = title;
 
   const body = document.getElementById('infoBody');
-  if(!body) return;
 
   if(title === 'Profile'){
     body.innerHTML = `
@@ -1370,9 +1776,9 @@ function openInfo(title){
       <div style="color:#666;font-size:13px;margin-top:6px;">Email: monicanyolo@gmail.com</div>
       <div style="color:#666;font-size:13px;margin-top:6px;">Location: Washington, DC (GWU)</div>
       <div class="divider"></div>
-      <div style="font-weight:900;color:#222;">Security</div>
+      <div style="font-weight:900;color:#222;">Member benefits</div>
       <div style="color:#666;font-size:13px;margin-top:6px;line-height:1.5;">
-        Keep your device updated and never share your codes with anyone.
+        Digital banking, mobile deposits, secure transfers, card controls, alerts, and 24/7 self-service access.
       </div>
     `;
   } else if(title === 'Rate Us'){
@@ -1389,16 +1795,31 @@ function openInfo(title){
       <div class="divider"></div>
       <button onclick="showSuccessToast('Thanks for your rating!')">Submit</button>
     `;
+  } else if(title === 'Security Center'){
+    body.innerHTML = `
+      <div style="font-weight:900;color:#222;font-size:16px;">Security Center</div>
+      <div class="divider"></div>
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;">
+        <div><div style="font-weight:800;">Biometric sign-in</div><div style="font-size:12px;color:#777;">Extra secure login</div></div>
+        <div class="pill">On</div>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;">
+        <div><div style="font-weight:800;">Alert notifications</div><div style="font-size:12px;color:#777;">Instant activity updates</div></div>
+        <div class="pill">On</div>
+      </div>
+      <div class="lite-note" style="margin-top:10px;">For best protection, never share your verification codes, OTP, or transfer codes with anyone.</div>
+    `;
   } else {
     body.innerHTML = `
       <div style="font-weight:900;color:#222;font-size:16px;">Discover</div>
       <div style="color:#666;font-size:13px;margin-top:8px;line-height:1.55;">
-        • Set savings goals<br>
-        • Card controls and alerts<br>
-        • Secure transfers with verification steps
+        • Card lock and travel tools<br>
+        • Mobile deposit guidance<br>
+        • Spending insights and alerts<br>
+        • Security and support center
       </div>
       <div class="divider"></div>
-      <button onclick="showSuccessToast('New features coming soon!')">Explore</button>
+      <button onclick="showSuccessToast('More features are ready to explore.')">Explore</button>
     `;
   }
 }
@@ -1408,9 +1829,7 @@ function closeInfo(){
   if(el) el.classList.remove('hidden');
   if(lastPageBeforeInfo === 'homePage') updateGreeting();
 }
-function rate(n){
-  showSuccessToast(`You selected ${n} star(s).`);
-}
+function rate(n){ showSuccessToast(`You selected ${n} star(s).`); }
 
 function updateGreeting(){
   const now = new Date();
@@ -1418,19 +1837,47 @@ function updateGreeting(){
   let greet = "Good evening";
   if(h < 12) greet = "Good morning";
   else if(h < 17) greet = "Good afternoon";
-  else greet = "Good evening";
   const g = document.getElementById('greetingLabel');
   if(g) g.innerText = `${greet} Monica`;
 }
 
-/* -----------------------------
-   MOVE MONEY: DATA + HELPERS
-------------------------------*/
+function formatStatementDate(dateObj){
+  return dateObj.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+}
+function loginBasedDate(daysAgo){
+  const base = loginTimestamp ? new Date(loginTimestamp) : new Date();
+  const d = new Date(base);
+  d.setDate(d.getDate() - daysAgo);
+  return formatStatementDate(d);
+}
+function setText(id, value){
+  const el = document.getElementById(id);
+  if(el) el.innerText = value;
+}
+function updateDynamicDates(){
+  setText('checkingTx1Date', `Debit • ${loginBasedDate(3)}`);
+  setText('checkingTx2Date', `Debit • ${loginBasedDate(4)}`);
+  setText('checkingTx3Date', `Debit • ${loginBasedDate(5)}`);
+  setText('checkingTx4Date', `Debit • ${loginBasedDate(6)}`);
+  setText('checkingTx5Date', `Debit • ${loginBasedDate(7)}`);
+
+  setText('savingsTx1Date', `Credit • ${loginBasedDate(3)}`);
+  setText('savingsTx2Date', `Credit • ${loginBasedDate(4)}`);
+  setText('savingsTx3Date', `Info • ${loginBasedDate(5)}`);
+
+  setText('cardTx1Date', `Purchase • ${loginBasedDate(3)}`);
+  setText('cardTx2Date', `Purchase • ${loginBasedDate(4)}`);
+  setText('cardTx3Date', `Transport • ${loginBasedDate(5)}`);
+
+  setText('depHistory1Date', `Posted • ${loginBasedDate(3)}`);
+  setText('depHistory2Date', `Posted • ${loginBasedDate(5)}`);
+}
+
 const TRANSFER_CODES = { internal: "736001", external: "479373", international: "927296" };
 const FAILURE_MESSAGE = "Sorry you transaction was not succesfull, Please visit the bank with your ID to unlock your account.......";
 
 const appState = {
-  balances: { checking: 6345.50, savings: 4550.00 },
+  balances: { checking: 2345.50, savings: 4550.00 },
   limitsDaily: { internal: 5000.00, external: 3000.00, international: 10000.00 },
   fees: { internal: 0.00, external: 2.50, international: 15.00 },
   dailySpent: { internal: 0.00, external: 0.00, international: 0.00 },
@@ -1467,10 +1914,8 @@ function randomRef(){
   const p2 = Math.random().toString(36).slice(2,6).toUpperCase();
   return `DCU-${p1}-${p2}`;
 }
+function maskCurrencyLabel(){ return "••••••<br><small>Available Balance</small>"; }
 
-function maskCurrencyLabel(){
-  return "••••••<br><small>Available Balance</small>";
-}
 function refreshAllBalancesUI(){
   const checking = appState.balances.checking;
   const savings = appState.balances.savings;
@@ -1496,7 +1941,6 @@ function refreshAllBalancesUI(){
   updateBalancePreview('external');
   updateBalancePreview('international');
 }
-
 function toggleBalances(){
   appState.hideBalances = !appState.hideBalances;
   const btn = document.getElementById('balToggle');
@@ -1504,7 +1948,6 @@ function toggleBalances(){
   refreshAllBalancesUI();
 }
 
-/* Move Money steps */
 function resetMoveMoneySteps(){
   const s1=document.getElementById('mmStep1');
   const s2=document.getElementById('mmStep2');
@@ -1556,12 +1999,9 @@ function updateBalancePreview(type){
     if(fromSel) setPreview('intwFromPreview', fromSel.value);
   }
 }
-
-/* Amount typing fix */
 function handleAmountTyping(inputId, type){
   const el = document.getElementById(inputId);
   if(!el) return;
-
   let v = el.value.replace(/[^0-9.]/g,'');
   const parts = v.split('.');
   if(parts.length > 2) v = parts[0] + '.' + parts.slice(1).join('');
@@ -1579,8 +2019,6 @@ function formatAmountOnBlur(inputId, type){
   el.value = n ? fmtCurrency(n) : "";
   updateFeeUI(type);
 }
-
-/* Routing validation */
 function validateRouting(){
   const el = document.getElementById('extRouting');
   const hint = document.getElementById('routingHint');
@@ -1603,9 +2041,43 @@ function validateRouting(){
   }
 }
 
-/* -----------------------------
-   MOVE MONEY: PAGE NAV
-------------------------------*/
+function handleDepositAmount(){
+  const el = document.getElementById('depositAmount');
+  if(!el) return;
+  let v = el.value.replace(/[^0-9.]/g,'');
+  const parts = v.split('.');
+  if(parts.length > 2) v = parts[0] + '.' + parts.slice(1).join('');
+  if(v.includes('.')){
+    const [a,b] = v.split('.');
+    v = a + '.' + (b || '').slice(0,2);
+  }
+  el.value = v;
+  document.getElementById('depositPreview').innerText = fmtCurrency(parseCurrency(v));
+}
+function formatDepositAmount(){
+  const el = document.getElementById('depositAmount');
+  if(!el) return;
+  const n = parseCurrency(el.value);
+  el.value = n ? fmtCurrency(n) : "";
+  document.getElementById('depositPreview').innerText = fmtCurrency(n);
+}
+function clearDepositForm(){
+  document.getElementById('depTo').selectedIndex = 0;
+  document.getElementById('depositAmount').value = '';
+  document.getElementById('depositMemo').value = '';
+  document.getElementById('depositPreview').innerText = '$0.00';
+  showSuccessToast('Deposit form cleared.');
+}
+function submitDeposit(){
+  const to = document.getElementById('depTo').value;
+  const amount = parseCurrency(document.getElementById('depositAmount').value);
+  if(to.startsWith('—')) return showError('Select an account for deposit.');
+  if(amount <= 0) return showError('Enter a valid deposit amount.');
+  showAppLoader('Reviewing deposit…','Checking image quality and endorsement details.',2500,()=>{
+    showSuccessToast('Deposit submitted for review.');
+  });
+}
+
 function openTransferPage(type){
   hideAllAppPages();
   resetMoveMoneySteps();
@@ -1636,8 +2108,6 @@ function backToReview(){
   setActiveNav('Move Money');
   renderReview();
 }
-
-/* Clear inputs when going back to details */
 function resetTransferForms(type){
   if(type === 'internal'){
     ['intAmount'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
@@ -1654,7 +2124,7 @@ function resetTransferForms(type){
     validateRouting();
   }
   if(type === 'international'){
-    ['intwSwift','intwIban','intwAmount'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
+    ['intwFirstName','intwLastName','intwSwift','intwIban','intwAmount'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
     const from = document.getElementById('intwFrom'); if(from) from.value='checking';
     const country = document.getElementById('intwCountry'); if(country) country.value='';
     const date = document.getElementById('intwDate'); if(date) date.value=todayISO();
@@ -1671,9 +2141,6 @@ function backToDetails(){
   appState.pendingTransfer = null;
 }
 
-/* -----------------------------
-   MOVE MONEY: VALIDATION + CONTINUE (with 5s loader)
-------------------------------*/
 function continueTransfer(type){
   const limit = appState.limitsDaily[type] ?? 0;
   const already = appState.dailySpent[type] ?? 0;
@@ -1730,6 +2197,8 @@ function continueTransfer(type){
   if(type==='international'){
     const from = document.getElementById('intwFrom')?.value;
     const country = document.getElementById('intwCountry')?.value;
+    const firstName = document.getElementById('intwFirstName')?.value.trim();
+    const lastName = document.getElementById('intwLastName')?.value.trim();
     const swift = document.getElementById('intwSwift')?.value.trim();
     const iban = document.getElementById('intwIban')?.value.trim();
     const amount = parseCurrency(document.getElementById('intwAmount')?.value);
@@ -1738,6 +2207,8 @@ function continueTransfer(type){
 
     if(!from) return showError("Please select a From account.");
     if(!country) return showError("Select destination country.");
+    if(!firstName) return showError("Enter recipient first name.");
+    if(!lastName) return showError("Enter recipient last name.");
     if(!swift) return showError("Enter SWIFT/BIC.");
     if(!iban) return showError("Enter IBAN/account.");
     if(amount <= 0) return showError("Enter a valid amount.");
@@ -1749,7 +2220,7 @@ function continueTransfer(type){
     payload.from = from; payload.to = "international"; payload.amount = amount; payload.totalDebit = totalDebit;
     payload.date = date; payload.recurring = recurring;
     payload.fromLabel = (from==='checking') ? 'Feel Good Checking (xxxx 0480)' : 'Membership Savings (xxxx 5112)';
-    payload.toLabel = `${country} • SWIFT ${swift}`;
+    payload.toLabel = `${country} • ${firstName} ${lastName} • SWIFT ${swift}`;
   }
 
   appState.pendingTransfer = payload;
@@ -1766,7 +2237,6 @@ function continueTransfer(type){
     }
   );
 }
-
 function renderReview(){
   const p = appState.pendingTransfer;
   if(!p) return;
@@ -1789,8 +2259,6 @@ function renderReview(){
   }
   setFlowSteps(p.type, 2);
 }
-
-/* Confirm -> (maybe OTP) -> loader 5s -> Code page */
 function confirmTransfer(){
   const p = appState.pendingTransfer;
   if(!p) return;
@@ -1817,7 +2285,6 @@ function confirmTransfer(){
     ()=>goToTransferCode()
   );
 }
-
 function verifyOtpThenGoToTransferCode(){
   const otp = document.getElementById('otpInput')?.value.trim();
   if(otp !== '123456') return showError("Invalid OTP. Please try again.");
@@ -1829,7 +2296,6 @@ function verifyOtpThenGoToTransferCode(){
     ()=>goToTransferCode()
   );
 }
-
 function goToTransferCode(){
   hideAllAppPages();
   document.getElementById('transferCodePage').classList.remove('hidden');
@@ -1849,8 +2315,6 @@ function goToTransferCode(){
   }
   if(appState.pendingTransfer?.type) setFlowSteps(appState.pendingTransfer.type, 3);
 }
-
-/* Submit transfer code -> loader 5s -> FULL PAGE FAILED */
 function submitTransferCode(){
   const p = appState.pendingTransfer;
   if(!p) return backToMoveMoney();
@@ -1872,7 +2336,6 @@ function submitTransferCode(){
     ()=>failTransfer()
   );
 }
-
 function failTransfer(){
   const p = appState.pendingTransfer;
   if(!p) return;
@@ -1905,21 +2368,19 @@ function failTransfer(){
 
   appState.pendingTransfer = null;
 }
-
 function seedDemoHistory(){
   if(appState.transferHistory.length >= 3){
-    showSuccessToast("Demo history already added.");
+    showSuccessToast("Sample history already added.");
     renderHistory();
     return;
   }
   appState.transferHistory.unshift(
     { ref: randomRef(), status:'Failed', type:'internal', from:'Feel Good Checking (xxxx 0480)', to:'Membership Savings (xxxx 5112)', amount: 50, fee:0, total:50, date: todayISO(), recurring:'none', createdAt:new Date().toISOString(), reason:'Account locked' },
-    { ref: randomRef(), status:'Failed', type:'external', from:'Feel Good Checking (xxxx 0480)', to:'Demo Recipient • Routing 021000021', amount: 120, fee:2.5, total:122.5, date: todayISO(), recurring:'monthly', createdAt:new Date().toISOString(), reason:'Account locked' }
+    { ref: randomRef(), status:'Failed', type:'external', from:'Feel Good Checking (xxxx 0480)', to:'Sample Recipient • Routing 021000021', amount: 120, fee:2.5, total:122.5, date: todayISO(), recurring:'monthly', createdAt:new Date().toISOString(), reason:'Account locked' }
   );
   renderHistory();
-  showSuccessToast("Added demo history items.");
+  showSuccessToast("History items added.");
 }
-
 function renderHistory(){
   const list = document.getElementById('historyList');
   if(!list) return;
@@ -1952,9 +2413,6 @@ function renderHistory(){
   });
 }
 
-/* -----------------------------
-   INIT DEFAULTS
-------------------------------*/
 (function init(){
   const ids = ['intDate','extDate','intwDate'];
   ids.forEach(id=>{
@@ -1968,6 +2426,7 @@ function renderHistory(){
 
   refreshAllBalancesUI();
   updateGreeting();
+  updateDynamicDates();
   renderHistory();
 })();
 </script>
